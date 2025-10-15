@@ -15,3 +15,12 @@ export class PRODUCT {
     this.찜꽁 = this.찜꽁.slice(0, 3) + num;
   }
 }
+
+const Manufacturer = ["IG", "SamsSong", "P.APPLE", "Soni", "Phylaps"];
+
+export class ElectronicProduct extends PRODUCT {
+  constructor(name, description, price, tags, images, 찜꽁) {
+    super(name, description, price, tags, images, 찜꽁);
+    this.manufacturer = Manufacturer[Math.floor(Math.random() * 5)]; //'Math.floor(Math.random() * 5)' <= mdn 참고
+  }
+}
