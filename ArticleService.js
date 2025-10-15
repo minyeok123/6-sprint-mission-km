@@ -39,7 +39,7 @@ export const getArticle = (id) => {
 };
 
 //------------------------------------------------------------------------------
-export const creatArticle = (NewArticle) => {
+export const createArticle = (NewArticle) => {
   return fetch(`https://panda-market-api-crud.vercel.app/articles`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

@@ -51,7 +51,7 @@ export async function getProduct(id) {
 }
 
 //------------------------------------------------------------------------
-export async function creatProduct(productData) {
+export async function createProduct(productData) {
   let res;
   try {
     res = await fetch("https://panda-market-api-crud.vercel.app/products", {
@@ -80,7 +80,7 @@ export async function creatProduct(productData) {
 }
 
 //------------------------------------------------------------------------
-export async function patchPrduct(id, productData) {
+export async function patchProduct(id, productData) {
   let res;
   try {
     res = await fetch(
