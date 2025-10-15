@@ -8,10 +8,16 @@ export const getArticleList = (page, pageSize, keyword) => {
   }
   return fetch(url)
     .then((res) => {
+      if (res.status >= 300) {
+        console.log("응답 코드가 2XX가 아님!");
+      }
       return res.json();
     })
     .then((data) => {
       return data;
+    })
+    .catch((err) => {
+      console.log(err);
     });
 };
 
@@ -19,10 +25,16 @@ export const getArticleList = (page, pageSize, keyword) => {
 export const getArticle = (id) => {
   return fetch(`https://panda-market-api-crud.vercel.app/articles/${id}`)
     .then((res) => {
+      if (res.status >= 300) {
+        console.log("응답 코드가 2XX가 아님!");
+      }
       return res.json();
     })
     .then((data) => {
       return data;
+    })
+    .catch((err) => {
+      console.log(err);
     });
 };
 
@@ -34,10 +46,16 @@ export const creatArticle = (NewArticle) => {
     body: JSON.stringify(NewArticle),
   })
     .then((res) => {
+      if (res.status >= 300) {
+        console.log("응답 코드가 2XX가 아님!");
+      }
       return res.json();
     })
     .then((data) => {
       return data;
+    })
+    .catch((err) => {
+      console.log(err);
     });
 };
 
@@ -49,22 +67,37 @@ export const patchArticle = (id, articleData) => {
     body: JSON.stringify(articleData),
   })
     .then((res) => {
+      if (res.status >= 300) {
+        console.log("응답 코드가 2XX가 아님!");
+      }
       return res.json();
     })
     .then((data) => {
       return data;
+    })
+    .catch((err) => {
+      console.log(err);
     });
 };
 
 //--------------------------------------------------------------------------------------
 export const deleteArticle = (id) => {
-  return fetch(`https://panda-market-api-crud.vercel.app/articles/${id}`, {
-    method: "DELETE",
-  })
+  return fetch(
+    `https://panㅁㄴㅇda-market-api-crud.vercel.app/articles/${id}`,
+    {
+      method: "DELETE",
+    }
+  )
     .then((res) => {
+      if (res.status >= 300) {
+        console.log("응답 코드가 2XX가 아님!");
+      }
       return res.json();
     })
     .then((data) => {
       return data;
+    })
+    .catch((err) => {
+      console.log(err);
     });
 };
