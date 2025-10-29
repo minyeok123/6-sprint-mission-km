@@ -1,6 +1,6 @@
 export const USERS = [
   {
-    id: '82db9f3e-68ab-447d-a19a-5720428453d7    ',
+    id: '82db9f3e-68ab-447d-a19a-5720428453d7',
     email: 'seeding@naver.com',
     name: '김민혁',
     createdAt: '2023-07-16T02:15:00.000Z',
