@@ -1,25 +1,29 @@
 import express from 'express';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { assert } from 'superstruct';
-import { CreateProduct, PatchProduct } from '../structers/struct.js';
+import { CreateProduct, PatchProduct } from '../structers/productStruct.js';
 
 // const app = express();
-// app.use(express.json());
+// app.use(express.json()); >> app.js에 이미 있음
 const prisma = new PrismaClient();
 
 const productRouter = express.Router();
 
+//리스트 조회, 상품 등록
 productRouter
   .route('/')
   .get(async (req, res) => {
-    const { offset = 0, limit = 10, order = 'newest', search } = req.query;
+    const { offset = 0, limit = 10, order, search } = req.query;
     let orderBy;
     switch (order) {
+      case 'recent':
+        orderBy = { createdAt: 'desc' };
+        break;
       case 'oldest':
         orderBy = { createdAt: 'asc' };
         break;
       default:
-        orderBy = { createdAt: 'desc' };
+        orderBy = {};
     }
     // const where = search ? { name || description:search} : {};
     const where = search
@@ -34,6 +38,7 @@ productRouter
       take: parseInt(limit),
       // include: { description: false, updatedAt: false }, >> 첫 시도, 잠재적 문제 발생 할 수도있음,prisma에서 의도한 사용방법이 아님
       select: {
+        //findMany 도움말 참고
         id: true,
         name: true,
         price: true,
@@ -50,12 +55,21 @@ productRouter
     res.send(product);
   });
 
+//상품 상세 조회 , 상품 업데이트 , 상품 삭제
 productRouter
   .route('/:id')
   .get(async (req, res) => {
     const { id } = req.params;
     const product = await prisma.product.findUnique({
       where: { id },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        tags: true,
+        createdAt: true,
+      },
     });
     res.status(200).send(product);
   })
