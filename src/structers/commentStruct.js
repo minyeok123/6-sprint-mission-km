@@ -12,10 +12,6 @@ export const CreateProductComment = s.object({
   }),
 });
 
-export const PatchComment = s.object({
-  content: s.size(s.string(), 1, 50),
-});
-
 export const CreateAricleComment = s.object({
   content: s.size(s.string(), 1, 50),
   user: s.object({
@@ -24,4 +20,8 @@ export const CreateAricleComment = s.object({
   article: s.object({
     articleId: s.define('Uuid', (value) => isUuid.v4(value)),
   }),
+});
+
+export const PatchComment = s.object({
+  content: s.size(s.string(), 1, 50),
 });
