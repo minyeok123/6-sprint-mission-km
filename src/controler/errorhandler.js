@@ -2,6 +2,7 @@ import { StructError } from 'superstruct';
 import { Prisma } from '@prisma/client';
 
 export function tryCatchHandler(handler) {
+  // handler(req,res)를 tryCatchHandler 의 파라미터로 정의해야함
   return async (req, res, next) => {
     try {
       await handler(req, res);

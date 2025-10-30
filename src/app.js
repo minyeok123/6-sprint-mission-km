@@ -4,9 +4,13 @@ import { PORT } from '../constants.js';
 import articleRouter from './routers/articleRouter.js';
 import commentRouter from './routers/commentRouter.js';
 import { errorHandler } from './controler/errorhandler.js';
+import cors from 'cors';
 
 const app = express();
 app.use(express.json());
+
+app.use('/files', express.static('uploads'));
+app.use(cors());
 
 //중고마켓 라우트 핸들러
 app.use('/products', productRouter);

@@ -4,10 +4,13 @@ import { assert } from 'superstruct';
 import { CreateArticle, PatchArticle } from '../structers/articleStruct.js';
 import { asyncDeleteHandler } from '../controler/deleteHandler.js';
 import { tryCatchHandler } from '../controler/errorhandler.js';
-
+import { uploadHandler } from '../controler/upload.js';
+import multer from 'multer';
 const prisma = new PrismaClient();
 
 const articleRouter = express.Router();
+
+const upload = multer({ dest: 'articlesUpload/' });
 // 자유게시판 목록 조회 및 생성
 articleRouter
   .route('/')
@@ -76,5 +79,8 @@ articleRouter
     }),
   )
   .delete(tryCatchHandler(asyncDeleteHandler(prisma.article)));
+
+// 자유게시판 이미지 업로드
+articleRouter.post('/files', upload.single('attachment'), tryCatchHandler(uploadHandler()));
 
 export default articleRouter;
