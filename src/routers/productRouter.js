@@ -67,7 +67,7 @@ productRouter
   .get(
     tryCatchHandler(async (req, res) => {
       const { id } = req.params;
-      const product = await prisma.product.findUnique({
+      const product = await prisma.product.findUniqueOrThrow({
         where: { id },
         select: {
           id: true,
