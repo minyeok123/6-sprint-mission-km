@@ -13,6 +13,7 @@ export function tryCatchHandler(handler) {
 }
 
 export function errorHandler(e, req, res, next) {
+  //   (&&) 연산자는 "내가 반환하는 값이 true인가? false인가?" 에는 관심이 없음. 규칙에 따라 값을 전달. if 문이 &&연산자가 truthy값인지 falsy값인지 판단
   if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
     return res.status(404).send({ message: '객체를 찾을 수 없음' });
   } else if (e.name === 'StructError') {

@@ -3,6 +3,7 @@ import productRouter from './routers/productRouter.js';
 import { PORT } from '../constants.js';
 import articleRouter from './routers/articleRouter.js';
 import commentRouter from './routers/commentRouter.js';
+import userRouter from './routers/userRouter.js';
 import { errorHandler } from './controler/errorhandler.js';
 import cors from 'cors';
 
@@ -20,6 +21,9 @@ app.use('/articles', articleRouter);
 
 //중고마켓 댓글
 app.use('/comments', commentRouter);
+
+//이용자 라우트 핸들러
+app.use('/users', userRouter);
 
 //전역 에러핸들러
 app.use(errorHandler);
