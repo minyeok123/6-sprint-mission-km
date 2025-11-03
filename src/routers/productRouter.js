@@ -78,7 +78,7 @@ productRouter
           name: true,
           description: true,
           price: true,
-          tags: true,
+          tag: true,
           createdAt: true,
         },
       });

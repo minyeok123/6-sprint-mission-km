@@ -43,15 +43,13 @@ articleRouter
       res.status(200).send(article);
     }),
   )
-  .post(
-    validate(async (req, res) => {
-      const { title, content } = req.body;
-      const article = await prisma.article.create({
-        data: { title, content },
-      });
-      res.status(201).send(article);
-    }),
-  );
+  .post(validate(CreateArticle), async (req, res) => {
+    const { title, content } = req.body;
+    const article = await prisma.article.create({
+      data: { title, content },
+    });
+    res.status(201).send(article);
+  });
 // 자유게시판 상세 조회 및 수정 및 삭제
 articleRouter
   .route('/:id')
