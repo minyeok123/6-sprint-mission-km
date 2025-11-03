@@ -1,17 +1,17 @@
 import express from 'express';
 import { Prisma, PrismaClient } from '@prisma/client';
-import { assert } from 'superstruct';
+import { validate } from '../middleware/validate.js';
+
 import { CreateProduct, PatchProduct } from '../structers/productStruct.js';
-import { asyncDeleteHandler } from '../controler/deleteHandler.js';
-import { tryCatchHandler } from '../controler/errorhandler.js';
-import { uploadHandler } from '../controler/upload.js';
+import { asyncDeleteHandler } from '../handler/deleteHandler.js';
+import { tryCatchHandler } from '../handler/errorhandler.js';
+import { uploadHandler } from '../handler/upload.js';
 import multer from 'multer';
 
 // const app = express();
 // app.use(express.json()); >> app.js에 이미 있음
 const prisma = new PrismaClient();
 const productRouter = express.Router();
-const upload = multer({ dest: 'productupload/' });
 
 //리스트 조회, 상품 등록
 productRouter
@@ -30,7 +30,7 @@ productRouter
         default:
           orderBy = {};
       }
-      // const where = search ? { name || description:search} : {};
+      // const where = search ? { name || description:search} : {}; >> 첫 시도
       const where = search
         ? { OR: [{ name: { contains: search } }, { description: { contains: search } }] }
         : {};
@@ -54,15 +54,15 @@ productRouter
     }),
   )
   .post(
+    validate(CreateProduct),
     tryCatchHandler(async (req, res) => {
-      assert(req.body, CreateProduct);
       const product = await prisma.product.create({
         data: req.body,
       });
       res.send(product);
     }),
   );
-// .post('/files', upload.single('attachment'), uploadHandler()); >> rout().post() 처럼 라우트 체인 안에 있을때는 따로 post api 만들기
+// .post('/files', upload.single('attachment'), uploadHandler()); >> route().post() 처럼 라우트 체인 안에 있을때는 따로 post api 만들기
 
 //app.use('/files', express.static('uploads')); //>> app.js 미들웨어로 추가
 //상품 상세 조회 , 상품 업데이트 , 상품 삭제
@@ -86,9 +86,10 @@ productRouter
     }),
   )
   .patch(
+    validate(PatchProduct),
     tryCatchHandler(async (req, res) => {
       const { id } = req.params;
-      assert(req.body, PatchProduct);
+
       const product = await prisma.product.update({
         where: { id },
         data: req.body,
@@ -99,6 +100,7 @@ productRouter
   .delete(tryCatchHandler(asyncDeleteHandler(prisma.product)));
 
 // 상품 이미지 업로드
+const upload = multer({ dest: 'productupload/' });
 productRouter.post('/files', upload.single('attachment'), tryCatchHandler(uploadHandler()));
 
 export default productRouter;

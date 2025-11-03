@@ -5,9 +5,10 @@ import {
   CreateProductComment,
   PatchComment,
 } from '../structers/commentStruct.js';
-import { assert } from 'superstruct';
-import { asyncDeleteHandler } from '../controler/deleteHandler.js';
-import { tryCatchHandler } from '../controler/errorhandler.js';
+import { validate } from '../middleware/validate.js';
+
+import { asyncDeleteHandler } from '../handler/deleteHandler.js';
+import { tryCatchHandler } from '../handler/errorhandler.js';
 
 const prisma = new PrismaClient();
 
@@ -18,8 +19,8 @@ app.use;
 
 //중고마켓 댓글 작성
 commentRouter.route('/products').post(
+  validate(CreateProductComment),
   tryCatchHandler(async (req, res) => {
-    assert(req.body, CreateProductComment);
     const { content, product, user } = req.body;
 
     const productComment = await prisma.comment.create({
@@ -46,8 +47,8 @@ commentRouter.route('/products').post(
 
 //자유게시판 댓글 생성
 commentRouter.route('/articles').post(
+  validate(CreateAricleComment),
   tryCatchHandler(async (req, res) => {
-    assert(req.body, CreateAricleComment);
     const { content, article, user } = req.body;
     const articleComment = await prisma.comment.create({
       data: {
@@ -61,13 +62,14 @@ commentRouter.route('/articles').post(
   }),
 );
 
-//댓글 조회 및 삭제
+//댓글 수정 및 삭제
 commentRouter
   .route('/:id')
   .patch(
+    validate(PatchComment),
     tryCatchHandler(async (req, res) => {
       const { id } = req.params;
-      assert(req.body, PatchComment);
+
       const patchcomment = await prisma.comment.update({
         where: { id },
         data: req.body,

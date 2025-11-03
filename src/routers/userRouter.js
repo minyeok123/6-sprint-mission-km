@@ -1,8 +1,9 @@
 import express from 'express';
 import { Prisma, PrismaClient } from '@prisma/client';
-import { tryCatchHandler } from '../controler/errorhandler.js';
-import { asyncDeleteHandler } from '../controler/deleteHandler.js';
-import { assert } from 'superstruct';
+import { tryCatchHandler } from '../handler/errorhandler.js';
+import { asyncDeleteHandler } from '../handler/deleteHandler.js';
+import { validate } from '../middleware/validate.js';
+
 import { CreateUser, PatchUser } from '../structers/userStruct.js';
 const userRouter = express.Router();
 const prisma = new PrismaClient();
@@ -23,6 +24,7 @@ userRouter
       const user = await prisma.user.findMany({
         skip: parseInt(offset),
         take: parseInt(limit),
+        orderBy,
         select: {
           id: true,
           name: true,
@@ -35,8 +37,8 @@ userRouter
     }),
   )
   .post(
+    validate(CreateUser),
     tryCatchHandler(async (req, res) => {
-      assert(req.body, CreateUser);
       const { userPreference, ...userFields } = req.body;
       const received = userPreference ? userPreference.receivedEmail : false;
 
@@ -80,8 +82,8 @@ userRouter
     }),
   )
   .patch(
+    validate(PatchUser),
     tryCatchHandler(async (req, res) => {
-      assert(req.body, PatchUser);
       const { id } = req.params;
       const { userPreference, ...userFields } = req.body;
       const user = await prisma.user.update({

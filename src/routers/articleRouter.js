@@ -1,16 +1,16 @@
 import express from 'express';
 import { Prisma, PrismaClient } from '@prisma/client';
-import { assert } from 'superstruct';
+import { validate } from '../middleware/validate.js';
+
 import { CreateArticle, PatchArticle } from '../structers/articleStruct.js';
-import { asyncDeleteHandler } from '../controler/deleteHandler.js';
-import { tryCatchHandler } from '../controler/errorhandler.js';
-import { uploadHandler } from '../controler/upload.js';
+import { asyncDeleteHandler } from '../handler/deleteHandler.js';
+import { tryCatchHandler } from '../handler/errorhandler.js';
+import { uploadHandler } from '../handler/upload.js';
 import multer from 'multer';
 const prisma = new PrismaClient();
 
 const articleRouter = express.Router();
 
-const upload = multer({ dest: 'articlesUpload/' });
 // 자유게시판 목록 조회 및 생성
 articleRouter
   .route('/')
@@ -44,8 +44,7 @@ articleRouter
     }),
   )
   .post(
-    tryCatchHandler(async (req, res) => {
-      assert(req.body, CreateArticle);
+    validate(async (req, res) => {
       const { title, content } = req.body;
       const article = await prisma.article.create({
         data: { title, content },
@@ -67,8 +66,8 @@ articleRouter
     }),
   )
   .patch(
+    validate(PatchArticle),
     tryCatchHandler(async (req, res) => {
-      assert(req.body, PatchArticle);
       const { id } = req.params;
       const { title, content } = req.body;
       const article = await prisma.article.update({
@@ -81,6 +80,7 @@ articleRouter
   .delete(tryCatchHandler(asyncDeleteHandler(prisma.article)));
 
 // 자유게시판 이미지 업로드
+const upload = multer({ dest: 'articlesUpload/' });
 articleRouter.post('/files', upload.single('attachment'), tryCatchHandler(uploadHandler()));
 
 export default articleRouter;

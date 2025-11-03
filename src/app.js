@@ -4,8 +4,9 @@ import { PORT } from '../constants.js';
 import articleRouter from './routers/articleRouter.js';
 import commentRouter from './routers/commentRouter.js';
 import userRouter from './routers/userRouter.js';
-import { errorHandler } from './controler/errorhandler.js';
+import { errorHandler } from './handler/errorhandler.js';
 import cors from 'cors';
+import orderRouter from './routers/orderRouter.js';
 
 const app = express();
 app.use(express.json());
@@ -24,6 +25,9 @@ app.use('/comments', commentRouter);
 
 //이용자 라우트 핸들러
 app.use('/users', userRouter);
+
+//주문생성
+app.use('/orders', orderRouter);
 
 //전역 에러핸들러
 app.use(errorHandler);
