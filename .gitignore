@@ -3,3 +3,4 @@ node_modules/
 __http__/
 uploads/
 .vscode/
+dist/
