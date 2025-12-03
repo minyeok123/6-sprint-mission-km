@@ -1,10 +1,7 @@
-import {
-  ACCESS_TOKEN_COOKIE_NAME,
-  REFRESH_TOKEN_COOKIE_NAME,
-  NODE_ENV,
-} from '../utils/constants.js';
+import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME, NODE_ENV } from './constants.js';
+import { Response } from 'express';
 
-export const setTokenCookies = (res, accessToken, refreshToken) => {
+export const setTokenCookies = (res: Response, accessToken: string, refreshToken: string) => {
   res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, {
     httpOnly: true,
     secure: NODE_ENV === 'production',
@@ -20,7 +17,7 @@ export const setTokenCookies = (res, accessToken, refreshToken) => {
   });
 };
 
-export const clearTokenCookies = (res) => {
+export const clearTokenCookies = (res: Response): void => {
   res.clearCookie(ACCESS_TOKEN_COOKIE_NAME);
   res.clearCookie(REFRESH_TOKEN_COOKIE_NAME);
 };
