@@ -44,7 +44,7 @@ authRouter
     tryCatchHandler(AuthController.getCreatedProduct),
   )
   .get(
-    '/:userId/likedproducts',
+    '/:userId/liked-products',
     authenticate,
     profileUpload.none(),
     tryCatchHandler(AuthController.getLikedProduct),
