@@ -1,6 +1,4 @@
 import * as s from 'superstruct';
-import isEmail from 'is-email';
-import isUuid from 'is-uuid';
 
 const TAGS = ['FASHION', 'ELECTRONICS', 'KITCHENWARE'];
 export const CreateProduct = s.object({
