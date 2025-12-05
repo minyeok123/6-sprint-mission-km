@@ -1,10 +1,12 @@
 import { Prisma } from '@prisma/client';
 import fs from 'fs/promises';
-import path from 'path';
+import { Request, Response, NextFunction, RequestHandler } from 'express';
 
-export function tryCatchHandler(handler) {
+type AsyncHandler = (req: Request, res: Response) => Promise<any>;
+
+export function tryCatchHandler(handler: AsyncHandler): RequestHandler {
   // handler(req,res)를 tryCatchHandler 의 파라미터로 정의해야함
-  return async (req, res, next) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     try {
       await handler(req, res);
     } catch (e) {
@@ -13,7 +15,7 @@ export function tryCatchHandler(handler) {
   };
 }
 
-export async function errorHandler(e, req, res, next) {
+export async function errorHandler(e: Error, req: Request, res: Response, next: NextFunction) {
   if (req.file) {
     // 에러가 발생했는데, 업로드된 파일이 있다면?
     // 일단 파일을 삭제해서 "고아 파일"이 남지 않게 한다.

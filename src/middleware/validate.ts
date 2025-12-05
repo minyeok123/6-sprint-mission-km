@@ -1,7 +1,7 @@
-import { assert } from 'superstruct';
-
-export function validate(struct) {
-  return (req, res, next) => {
+import { assert, Struct } from 'superstruct';
+import { Request, Response, NextFunction } from 'express';
+export function validate<T, S>(struct: Struct<T, S>) {
+  return (req: Request, res: Response, next: NextFunction) => {
     try {
       assert(req.body, struct);
       next();

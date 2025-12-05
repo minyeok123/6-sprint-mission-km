@@ -1,6 +1,8 @@
-import { assert } from 'superstruct';
-export function productValidate(struct) {
-  return (req, res, next) => {
+import { assert, Struct } from 'superstruct';
+import { Request, Response, NextFunction } from 'express';
+
+export function productValidate<T, S>(struct: Struct<T, S>) {
+  return (req: Request, res: Response, next: NextFunction) => {
     try {
       const body = req.body;
       if (body.price) {
