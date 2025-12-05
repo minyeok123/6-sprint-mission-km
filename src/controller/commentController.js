@@ -73,21 +73,25 @@ export class commentController {
   };
 
   static getAllComment = async (req, res) => {
-    const { limit = 10, cursorId, page = '1' } = req.query;
+    const { limit = 10, cursorId } = req.query;
     const orderBy = { createdAt: 'desc' };
-    const cursor = cursorId ? { id: cursorId } : undefined; //>> undefined 값을 전달할시 해당 옶션은 없는 옵션으로 간주 >> 오류 발생 확률 내려감
-    const getAllComment = await prisma.comment.findMany({
-      cursor,
+    const comments = await prisma.comment.findMany({
+      cursor: cursorId ? { id: cursorId } : undefined,
+      skip: cursorId ? 1 : 0,
+      take: limit,
       orderBy,
-      skip: page === '1' ? 0 : 1,
-      take: parseInt(limit),
       select: {
         id: true,
         content: true,
         createdAt: true,
       },
     });
-    res.status(200).send(getAllComment);
+    let nextCursor = null;
+    if (comments.length === limit) {
+      nextCursor = comments[comments.length - 1].id;
+    }
+
+    res.status(200).send({ comments, nextCursor });
   };
   static deleteComment = async (req, res) => {
     const commentId = parseInt(req.params.commentId, 10);

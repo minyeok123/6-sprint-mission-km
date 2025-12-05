@@ -1,9 +1,10 @@
 import { prisma } from '../utils/prismaClient.js';
-
+import { Request, Response } from 'express';
 export class ArticleController {
   //게시글 목록 조회
-  static getArticles = async (req, res) => {
-    const { offset = 0, limit = 10, order, search } = req.query;
+  static getArticles = async (req: Request, res: Response) => {
+    const { page = 0, limit = 10, order, search } = req.query;
+
     const orderByOption = {
       recent: { createdAt: 'desc' },
       oldest: { createdAt: 'asc' },
@@ -15,7 +16,7 @@ export class ArticleController {
     const article = await prisma.article.findMany({
       where,
       orderBy: orderByOption[order] || orderByOption['recent'],
-      skip: parseInt(offset),
+      skip: parseInt(page),
       take: parseInt(limit),
       select: { id: true, title: true, content: true, createdAt: true },
     });

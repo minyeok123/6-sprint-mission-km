@@ -21,6 +21,7 @@ authRouter
   .post('/login', profileUpload.none(), validate(LoginUser), tryCatchHandler(AuthController.login))
   .post('/refresh', profileUpload.none(), tryCatchHandler(AuthController.refreshToken))
   .post('/logout', tryCatchHandler(AuthController.logout));
+
 authRouter
   .get('/:userId', authenticate, tryCatchHandler(AuthController.getInfo))
   .patch(

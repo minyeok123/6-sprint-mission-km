@@ -2,13 +2,13 @@ import { prisma } from '../utils/prismaClient.js';
 
 export class UserController {
   static getUsers = async (req, res) => {
-    const { offset = 0, limit = 10, order } = req.query;
+    const { page = 0, limit = 10, order } = req.query;
     const orderbyOption = {
       recent: { createdAt: 'desc' },
       oldest: { createdAt: 'asc' },
     };
     const user = await prisma.user.findMany({
-      skip: parseInt(offset),
+      skip: parseInt(page),
       take: parseInt(limit),
       orderBy: orderbyOption[order] || orderbyOption['recent'],
       select: {
