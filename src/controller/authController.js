@@ -8,7 +8,8 @@ export class AuthController {
   //회원가입
   static register = async (req, res) => {
     const { receivedEmail, password, ...userFields } = req.body;
-    // const received = userPreference ? userPreference.receivedEmail : false;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
     const profileImage = req.file;
 
     let image;
@@ -19,7 +20,7 @@ export class AuthController {
     const user = await prisma.user.create({
       data: {
         ...userFields,
-        password,
+        password: hashedPassword,
         userPreference: {
           create: {
             receivedEmail,

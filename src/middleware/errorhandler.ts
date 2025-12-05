@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import fs from 'fs/promises';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
-
+import { HttpError } from '../utils/errors.js';
 type AsyncHandler = (req: Request, res: Response) => Promise<any>;
 
 export function tryCatchHandler(handler: AsyncHandler): RequestHandler {
@@ -10,6 +10,9 @@ export function tryCatchHandler(handler: AsyncHandler): RequestHandler {
     try {
       await handler(req, res);
     } catch (e) {
+      if (e instanceof HttpError) {
+        return res.status(e.status).json({ message: e.message });
+      }
       next(e);
     }
   };

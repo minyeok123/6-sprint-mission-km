@@ -1,9 +1,12 @@
 import { assert, Struct } from 'superstruct';
 import { Request, Response, NextFunction } from 'express';
-export function validate<T, S>(struct: Struct<T, S>) {
+
+type RequestSource = 'body' | 'params' | 'query';
+
+export function validate<T, S>(struct: Struct<T, S>, source: RequestSource = 'body') {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
-      assert(req.body, struct);
+      assert(req[source], struct);
       next();
     } catch (e) {
       next(e);
