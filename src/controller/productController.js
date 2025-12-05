@@ -3,7 +3,7 @@ import { prisma } from '../utils/prismaClient.js';
 export class ProductController {
   //상품 리스트 조회
   static getProduct = async (req, res) => {
-    const { offset = 0, limit = 10, order, search } = req.query;
+    const { page = 0, limit = 10, order, search } = req.query;
     const orderbyOption = {
       recent: { createdAt: 'desc' },
       oldest: { createdAt: 'asc' },
@@ -17,7 +17,7 @@ export class ProductController {
     const product = await prisma.product.findMany({
       where,
       orderBy: orderbyOption[order] || orderbyOption['recent'],
-      skip: parseInt(offset),
+      skip: parseInt(page),
       take: parseInt(limit),
       // include: { description: false, updatedAt: false }, >> 첫 시도, 잠재적 문제 발생 할 수도있음,prisma에서 의도한 사용방법이 아님
       select: {

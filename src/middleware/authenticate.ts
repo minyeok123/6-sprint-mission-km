@@ -12,7 +12,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     const userId = parseInt(userIdString, 10);
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
-      return res.status(401).send({ message: '아이디 또는 비밀번호가 일치하지 않습니다.' });
+      return res.status(401).send({ message: '아이디 또는 비밀번호가 일치하지 않습니다' });
     }
     req.user = user;
     next();

@@ -32,6 +32,7 @@ articleRouter
     tryCatchHandler(ArticleController.patchArticle),
   )
   .delete(authenticate, tryCatchHandler(ArticleController.deleteArticle));
+
 //자유게시판 댓글 생성
 articleRouter
   .route('/:articleId/comments')
