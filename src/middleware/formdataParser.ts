@@ -2,8 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import multer from 'multer';
+import { Request } from 'express';
 
-export function UploadImage(subfolder) {
+export function UploadImage(subfolder: string): multer.Multer {
   // 1) 업로드 폴더 경로
   const uploadDir = path.join(process.cwd(), 'uploads', subfolder); //현재 작업 디렉토리(process.cwd()) 안에 있는 ‘uploads’ 폴더 경로를 만든다
 
@@ -26,7 +27,7 @@ export function UploadImage(subfolder) {
   });
 
   // 4) 이미지 파일만 허용하는 필터
-  function fileFilter(_req, file, cb) {
+  function fileFilter(_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) {
     if (/^image\//.test(file.mimetype)) {
       cb(null, true);
     } else {
@@ -37,7 +38,7 @@ export function UploadImage(subfolder) {
   // 5) multer middleware export
   return multer({
     storage,
-    limits: { filesize: 10 * 1024 * 1024 }, //10MB
+    limits: { fileSize: 10 * 1024 * 1024 }, //10MB
     fileFilter,
   });
 }
