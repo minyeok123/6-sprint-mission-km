@@ -7,7 +7,7 @@ import commentRouter from './routers/commentRouter.js';
 import userRouter from './routers/userRouter.js';
 import { errorHandler } from './middleware/errorhandler.js';
 import cors from 'cors';
-import orderRouter from './routers/orderRouter.js';
+// import orderRouter from './routers/orderRouter.js';
 import cookieParser from 'cookie-parser';
 import authRouter from './routers/authRouter.js';
 import likeRouter from './routers/likeRouter.js';
@@ -32,7 +32,7 @@ app.use('/comments', commentRouter);
 app.use('/users', userRouter);
 
 //주문생성
-app.use('/orders', orderRouter);
+// app.use('/orders', orderRouter);
 
 //인가 인증
 app.use('/auth', authRouter);

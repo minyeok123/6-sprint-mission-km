@@ -15,8 +15,8 @@ export type CreateProductType = Infer<typeof CreateProduct>;
 export const PatchProduct = s.partial(CreateProduct);
 export type PatchProductType = Infer<typeof PatchProduct>;
 
-export const ProductParams = IdParam('productId');
-export type ProductParamsType = Infer<typeof ProductParams>;
+export const ProductIdParams = IdParam('productId');
+export type ProductParamsType = Infer<typeof ProductIdParams>;
 
 export const GetProductsQuery = s.intersection([PaginationQuery, SearchQuery, OrderQuery]);
 export type GetProductsQueryType = Infer<typeof GetProductsQuery>;
