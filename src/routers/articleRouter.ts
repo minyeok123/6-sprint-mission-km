@@ -19,7 +19,7 @@ const articleImageUpload = UploadImage('article-image');
 // 자유게시판 목록 조회 및 생성
 articleRouter
   .route('/')
-  .get(validate(GetArticlesQuery, 'params'), tryCatchHandler(ArticleController.getArticles))
+  .get(validate(GetArticlesQuery, 'query'), tryCatchHandler(ArticleController.getArticles))
   .post(
     authenticate,
     articleImageUpload.array('articleImage', 5),
@@ -49,7 +49,7 @@ articleRouter
   .post(
     authenticate,
     textParser,
-    validate(CreateArticleComment),
+    validate(ArticleIdParams, 'params'),
     tryCatchHandler(commentController.createArticleComment),
   );
 

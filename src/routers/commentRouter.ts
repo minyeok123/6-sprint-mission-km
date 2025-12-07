@@ -1,5 +1,5 @@
 import express from 'express';
-import { PatchComment } from '../structs/commentStruct.js';
+import { CommentIdParams, PatchComment, GetCommentQuery } from '../structs/commentStruct.js';
 import { validate } from '../middleware/validate.js';
 import { tryCatchHandler } from '../middleware/errorhandler.js';
 import { commentController } from '../controller/commentController.js';
@@ -13,13 +13,19 @@ commentRouter
   .patch(
     authenticate,
     textParser,
-    validate(PatchComment),
+    validate(CommentIdParams, 'params'),
     tryCatchHandler(commentController.patchComment),
   )
-  .delete(authenticate, tryCatchHandler(commentController.deleteComment));
+  .delete(
+    authenticate,
+    validate(CommentIdParams, 'params'),
+    tryCatchHandler(commentController.deleteComment),
+  );
 
 //모든 댓글 조회
-commentRouter.route('/').get(tryCatchHandler(commentController.getAllComment));
+commentRouter
+  .route('/')
+  .get(validate(GetCommentQuery, 'query'), tryCatchHandler(commentController.getAllComment));
 
 export default commentRouter;
 // 프리즈마 문서만 참고해서 커서 옵션을 사용했을 때 시도 >> 실패

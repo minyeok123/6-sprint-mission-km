@@ -1,10 +1,10 @@
 import jwt, { SignOptions, JwtPayload } from 'jsonwebtoken';
 import { JWT_ACCESS_TOKEN_SECRET, JWT_REFRESH_TOKEN_SECRET } from './constants.js';
 interface customJwtPayload extends JwtPayload {
-  id: string;
+  id: number;
 }
 
-export const generateTokens = (userId: string): { accessToken: string; refreshToken: string } => {
+export const generateTokens = (userId: number): { accessToken: string; refreshToken: string } => {
   const accessToken = jwt.sign({ id: userId }, JWT_ACCESS_TOKEN_SECRET, {
     expiresIn: '1h',
     issuer: 'sprint-Mission4',
