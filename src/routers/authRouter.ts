@@ -1,9 +1,14 @@
 import express from 'express';
 import { validate } from '../middleware/validate.js';
-import { CreateUser, LoginUser, PatchPassword, PatchUser } from '../structs/userStruct.js';
+import {
+  CreateUser,
+  LoginUser,
+  PatchPassword,
+  PatchUser,
+  UserIdParams,
+} from '../structs/userStruct.js';
 import { tryCatchHandler } from '../middleware/errorhandler.js';
 import { UploadImage } from '../middleware/formdataParser.js';
-import { hashingPassword } from '../middleware/bcrypt.js';
 import { AuthController } from '../controller/authController.js';
 import { authenticate } from '../middleware/authenticate.js';
 
@@ -15,7 +20,6 @@ authRouter
     '/register',
     profileUpload.single('profileImage'),
     validate(CreateUser),
-    hashingPassword,
     tryCatchHandler(AuthController.register),
   )
   .post('/login', profileUpload.none(), validate(LoginUser), tryCatchHandler(AuthController.login))
@@ -23,11 +27,17 @@ authRouter
   .post('/logout', tryCatchHandler(AuthController.logout));
 
 authRouter
-  .get('/:userId', authenticate, tryCatchHandler(AuthController.getInfo))
+  .get(
+    '/:userId',
+    authenticate,
+    validate(UserIdParams, 'params'),
+    tryCatchHandler(AuthController.getInfo),
+  )
   .patch(
     '/:userId',
     authenticate,
     profileUpload.none(),
+    validate(UserIdParams, 'params'),
     validate(PatchUser),
     tryCatchHandler(AuthController.patchInfo),
   )
@@ -35,6 +45,7 @@ authRouter
     '/:userId/password',
     authenticate,
     profileUpload.none(),
+    validate(UserIdParams, 'params'),
     validate(PatchPassword),
     tryCatchHandler(AuthController.updatePassword),
   )
@@ -42,12 +53,14 @@ authRouter
     '/:userId/products',
     authenticate,
     profileUpload.none(),
+    validate(UserIdParams, 'params'),
     tryCatchHandler(AuthController.getCreatedProduct),
   )
   .get(
     '/:userId/liked-products',
     authenticate,
     profileUpload.none(),
+    validate(UserIdParams, 'params'),
     tryCatchHandler(AuthController.getLikedProduct),
   );
 
