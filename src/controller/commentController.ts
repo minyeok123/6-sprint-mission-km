@@ -114,7 +114,7 @@ export class commentController {
     await prisma.$transaction(async (tx) => {
       const foundComment = await tx.comment.findUniqueOrThrow({ where: { id: commentId } });
       if (foundComment.userId !== user.id) {
-        throw { status: 401, message: '잘못된 접근입니다.' };
+        throw new HttpError(401, '잘못된 접근입니다.');
       }
       await tx.comment.delete({ where: { id: commentId } });
     });
