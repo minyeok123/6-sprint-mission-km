@@ -1,6 +1,11 @@
 import express from 'express';
 import { validate } from '../middleware/validate.js';
-import { CreateProduct, PatchProduct } from '../structs/productStruct.js';
+import {
+  CreateProduct,
+  GetProductsQuery,
+  PatchProduct,
+  ProductIdParams,
+} from '../structs/productStruct.js';
 import { CreateProductComment } from '../structs/commentStruct.js';
 import { tryCatchHandler } from '../middleware/errorhandler.js';
 import { ProductController } from '../controller/productController.js';
@@ -16,7 +21,7 @@ const productImageUpload = UploadImage('product-image');
 //리스트 조회, 상품 등록
 productRouter
   .route('/')
-  .get(tryCatchHandler(ProductController.getProduct))
+  .get(validate(GetProductsQuery, 'query'), tryCatchHandler(ProductController.getProduct))
   .post(
     authenticate,
     productImageUpload.array('productImage', 5),
@@ -33,16 +38,22 @@ productRouter
   .patch(
     authenticate,
     productImageUpload.none(),
+    validate(ProductIdParams, 'params'),
     productValidate(PatchProduct),
     tryCatchHandler(ProductController.patchProduct),
   )
-  .delete(authenticate, tryCatchHandler(ProductController.deleteProduct));
+  .delete(
+    authenticate,
+    validate(ProductIdParams, 'params'),
+    tryCatchHandler(ProductController.deleteProduct),
+  );
 //중고마켓 댓글 작성
 productRouter
   .route('/:productId/comments')
   .post(
     authenticate,
     textParser,
+    validate(ProductIdParams, 'params'),
     validate(CreateProductComment),
     tryCatchHandler(commentController.createProductComment),
   );

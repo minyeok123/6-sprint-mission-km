@@ -4,16 +4,21 @@ import { Request, Response } from 'express';
 import { HttpError } from '../utils/errors.js';
 import {
   CreateArticleCommentType,
+  CreateProductCommentType,
   PatchCommentType,
   CommentIdParams,
   GetCommentQueryType,
 } from '../structs/commentStruct.js';
+import { ProductIdParams } from '../structs/productStruct.js';
 export class commentController {
   static createProductComment = async (req: Request, res: Response) => {
-    const productId = parseInt(req.params.productId, 10);
-    const user = req.user;
-    const { content } = req.body;
+    const { productId } = ProductIdParams.create(req.params);
+    const { content } = req.body as CreateProductCommentType;
 
+    const user = req.user;
+    if (!user) {
+      throw new HttpError(401, '잘못된 접근입니다.');
+    }
     const productComment = await prisma.comment.create({
       data: {
         content,

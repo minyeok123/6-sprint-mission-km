@@ -4,13 +4,13 @@ import { authenticate } from '../middleware/authenticate.js';
 import { textParser } from '../middleware/formdataParser.js';
 import { Like } from '../controller/likeController.js';
 import { validate } from '../middleware/validate.js';
-import { ProductParams } from '../structs/productStruct.js';
+import { ProductIdParams } from '../structs/productStruct.js';
 import { ArticleIdParams } from '../structs/articleStruct.js';
 export const likeRouter = express.Router();
 
 likeRouter.post(
   '/productLike/:productId',
-  validate(ProductParams, 'params'),
+  validate(ProductIdParams, 'params'),
   authenticate,
   tryCatchHandler(Like.toggleProductLike),
 );
