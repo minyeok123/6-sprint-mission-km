@@ -1,7 +1,7 @@
-import { GetUserQueryType } from '../structs/userStruct.js';
-import { prisma } from '../utils/prismaClient.js';
+import { GetUserQueryType } from '../structs/userStruct';
+import { prisma } from '../utils/prismaClient';
 import { Request, Response } from 'express';
-import { UserIdParams } from '../structs/userStruct.js';
+import { UserIdParams } from '../structs/userStruct';
 export class UserController {
   static getUsers = async (req: Request, res: Response) => {
     const { page = 0, limit = 10, order } = req.query as GetUserQueryType;

@@ -1,10 +1,10 @@
 import express from 'express';
-import { CommentIdParams, PatchComment, GetCommentQuery } from '../structs/commentStruct.js';
-import { validate } from '../middleware/validate.js';
-import { tryCatchHandler } from '../middleware/errorhandler.js';
-import { commentController } from '../controller/commentController.js';
-import { authenticate } from '../middleware/authenticate.js';
-import { textParser } from '../middleware/formdataParser.js';
+import { CommentIdParams, PatchComment, GetCommentQuery } from '../structs/commentStruct';
+import { validate } from '../middleware/validate';
+import { tryCatchHandler } from '../middleware/errorhandler';
+import { commentController } from '../controller/commentController';
+import { authenticate } from '../middleware/authenticate';
+import { textParser } from '../middleware/formdataParser';
 const commentRouter = express.Router();
 
 //댓글 수정 및 삭제

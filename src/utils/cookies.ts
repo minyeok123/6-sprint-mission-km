@@ -1,4 +1,4 @@
-import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME, NODE_ENV } from './constants.js';
+import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME, NODE_ENV } from './constants';
 import { Response } from 'express';
 
 export const setTokenCookies = (res: Response, accessToken: string, refreshToken: string) => {

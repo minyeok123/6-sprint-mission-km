@@ -1,15 +1,15 @@
-import { ArticleIdParams } from '../structs/articleStruct.js';
-import { prisma } from '../utils/prismaClient.js';
+import { ArticleIdParams } from '../structs/articleStruct';
+import { prisma } from '../utils/prismaClient';
 import { Request, Response } from 'express';
-import { HttpError } from '../utils/errors.js';
+import { HttpError } from '../utils/errors';
 import {
   CreateArticleCommentType,
   CreateProductCommentType,
   PatchCommentType,
   CommentIdParams,
   GetCommentQueryType,
-} from '../structs/commentStruct.js';
-import { ProductIdParams } from '../structs/productStruct.js';
+} from '../structs/commentStruct';
+import { ProductIdParams } from '../structs/productStruct';
 export class commentController {
   static createProductComment = async (req: Request, res: Response) => {
     const { productId } = ProductIdParams.create(req.params);

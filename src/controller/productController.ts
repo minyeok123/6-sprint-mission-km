@@ -3,9 +3,9 @@ import {
   GetProductsQueryType,
   PatchProductType,
   ProductIdParams,
-} from '../structs/productStruct.js';
-import { HttpError } from '../utils/errors.js';
-import { prisma } from '../utils/prismaClient.js';
+} from '../structs/productStruct';
+import { HttpError } from '../utils/errors';
+import { prisma } from '../utils/prismaClient';
 import { Request, Response } from 'express';
 
 export class ProductController {

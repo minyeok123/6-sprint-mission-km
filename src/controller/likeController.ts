@@ -1,7 +1,7 @@
-import { ArticleIdParams } from '../structs/articleStruct.js';
-import { ProductIdParams } from '../structs/productStruct.js';
-import { HttpError } from '../utils/errors.js';
-import { prisma } from '../utils/prismaClient.js';
+import { ArticleIdParams } from '../structs/articleStruct';
+import { ProductIdParams } from '../structs/productStruct';
+import { HttpError } from '../utils/errors';
+import { prisma } from '../utils/prismaClient';
 import { Request, Response } from 'express';
 export class Like {
   static toggleProductLike = async (req: Request, res: Response) => {
