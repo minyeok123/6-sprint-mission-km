@@ -1,10 +1,15 @@
+import { ArticleIdParams } from '../structs/articleStruct.js';
+import { ProductParams } from '../structs/productStruct.js';
+import { HttpError } from '../utils/errors.js';
 import { prisma } from '../utils/prismaClient.js';
-
+import { Request, Response } from 'express';
 export class Like {
-  static toggleProductLike = async (req, res) => {
-    const productId = parseInt(req.params.productId, 10);
+  static toggleProductLike = async (req: Request, res: Response) => {
+    const { productId } = ProductParams.create(req.params);
     const user = req.user;
-
+    if (!user) {
+      throw new HttpError(401, '잘못된 접근입니다.');
+    }
     const isLikedProduct = await prisma.like.findFirst({
       where: {
         userId: user.id,
@@ -28,10 +33,12 @@ export class Like {
     }
   };
 
-  static toggleArticleLike = async (req, res) => {
-    const articleId = parseInt(req.params.articleId, 10);
+  static toggleArticleLike = async (req: Request, res: Response) => {
+    const { articleId } = ArticleIdParams.create(req.params);
     const user = req.user;
-
+    if (!user) {
+      throw new HttpError(401, '잘못된 접근입니다.');
+    }
     const isLikedArticle = await prisma.like.findFirst({
       where: {
         userId: user.id,

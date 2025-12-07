@@ -50,6 +50,7 @@ articleRouter
     authenticate,
     textParser,
     validate(ArticleIdParams, 'params'),
+    validate(CreateArticleComment),
     tryCatchHandler(commentController.createArticleComment),
   );
 

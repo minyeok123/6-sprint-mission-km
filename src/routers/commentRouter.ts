@@ -14,6 +14,7 @@ commentRouter
     authenticate,
     textParser,
     validate(CommentIdParams, 'params'),
+    validate(PatchComment),
     tryCatchHandler(commentController.patchComment),
   )
   .delete(
