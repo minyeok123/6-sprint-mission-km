@@ -1,16 +1,16 @@
 import express from 'express';
-import { validate } from '../middleware/validate.js';
+import { validate } from '../middleware/validate';
 import {
   CreateUser,
   LoginUser,
   PatchPassword,
   PatchUser,
   UserIdParams,
-} from '../structs/userStruct.js';
-import { tryCatchHandler } from '../middleware/errorhandler.js';
-import { UploadImage } from '../middleware/formdataParser.js';
-import { AuthController } from '../controller/authController.js';
-import { authenticate } from '../middleware/authenticate.js';
+} from '../structs/userStruct';
+import { tryCatchHandler } from '../middleware/errorhandler';
+import { UploadImage } from '../middleware/formdataParser';
+import { AuthController } from '../controller/authController';
+import { authenticate } from '../middleware/authenticate';
 
 const authRouter = express.Router();
 const profileUpload = UploadImage('user-profiles');

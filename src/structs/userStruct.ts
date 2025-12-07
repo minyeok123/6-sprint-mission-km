@@ -1,7 +1,7 @@
 import * as s from 'superstruct';
 import isEmail from 'is-email';
 import type { Infer } from 'superstruct';
-import { IdParam, PaginationQuery, OrderQuery } from './commonStruct.js';
+import { IdParam, PaginationQuery, OrderQuery } from './commonStruct';
 
 const emailValidator = (value: unknown): value is string => {
   return typeof value === 'string' && isEmail(value);

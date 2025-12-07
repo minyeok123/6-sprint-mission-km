@@ -1,17 +1,17 @@
 import express from 'express';
-import { validate } from '../middleware/validate.js';
+import { validate } from '../middleware/validate';
 import {
   CreateArticle,
   PatchArticle,
   GetArticlesQuery,
   ArticleIdParams,
-} from '../structs/articleStruct.js';
-import { CreateArticleComment } from '../structs/commentStruct.js';
-import { tryCatchHandler } from '../middleware/errorhandler.js';
-import { ArticleController } from '../controller/articleController.js';
-import { UploadImage, textParser } from '../middleware/formdataParser.js';
-import { authenticate } from '../middleware/authenticate.js';
-import { commentController } from '../controller/commentController.js';
+} from '../structs/articleStruct';
+import { CreateArticleComment } from '../structs/commentStruct';
+import { tryCatchHandler } from '../middleware/errorhandler';
+import { ArticleController } from '../controller/articleController';
+import { UploadImage, textParser } from '../middleware/formdataParser';
+import { authenticate } from '../middleware/authenticate';
+import { commentController } from '../controller/commentController';
 const articleRouter = express.Router();
 
 const articleImageUpload = UploadImage('article-image');

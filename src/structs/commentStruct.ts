@@ -1,6 +1,6 @@
 import * as s from 'superstruct';
 import type { Infer } from 'superstruct';
-import { IdParam } from './commonStruct.js';
+import { IdParam } from './commonStruct';
 export const CreateProductComment = s.object({
   content: s.size(s.string(), 1, 50),
 });

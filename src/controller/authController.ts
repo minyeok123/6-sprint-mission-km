@@ -1,16 +1,16 @@
-import { prisma } from '../utils/prismaClient.js';
+import { prisma } from '../utils/prismaClient';
 import bcrypt from 'bcrypt';
-import { generateTokens, verifyRefreshToken } from '../utils/token.js';
-import { clearTokenCookies, setTokenCookies } from '../utils/cookies.js';
-import { JWT_ACCESS_TOKEN_SECRET, REFRESH_TOKEN_COOKIE_NAME } from '../utils/constants.js';
+import { generateTokens, verifyRefreshToken } from '../utils/token';
+import { clearTokenCookies, setTokenCookies } from '../utils/cookies';
+import { JWT_ACCESS_TOKEN_SECRET, REFRESH_TOKEN_COOKIE_NAME } from '../utils/constants';
 import { Request, Response, NextFunction } from 'express';
 import {
   CreateUserType,
   LoginUserType,
   PatchPasswordType,
   UserIdParams,
-} from '../structs/userStruct.js';
-import { HttpError } from '../utils/errors.js';
+} from '../structs/userStruct';
+import { HttpError } from '../utils/errors';
 export class AuthController {
   //회원가입
   static register = async (req: Request, res: Response) => {

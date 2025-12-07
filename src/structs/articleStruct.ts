@@ -1,6 +1,6 @@
 import * as s from 'superstruct';
 import type { Infer } from 'superstruct';
-import { IdParam, PaginationQuery, SearchQuery, OrderQuery } from './commonStruct.js';
+import { IdParam, PaginationQuery, SearchQuery, OrderQuery } from './commonStruct';
 
 export const CreateArticle = s.object({
   title: s.size(s.string(), 1, 30),

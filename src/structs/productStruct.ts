@@ -1,7 +1,7 @@
 import * as s from 'superstruct';
 import type { Infer } from 'superstruct';
-import { IdParam, PaginationQuery, SearchQuery, OrderQuery } from './commonStruct.js';
-const TAGS = ['FASHION', 'ELECTRONICS', 'KITCHENWARE'];
+import { IdParam, PaginationQuery, SearchQuery, OrderQuery } from './commonStruct';
+const TAGS = ['FASHION', 'ELECTRONICS', 'KITCHENWARE'] as const;
 
 export const CreateProduct = s.object({
   productName: s.size(s.string(), 1, 30),

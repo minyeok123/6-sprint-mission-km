@@ -1,11 +1,11 @@
 import express, { Router } from 'express';
-import { tryCatchHandler } from '../middleware/errorhandler.js';
-import { authenticate } from '../middleware/authenticate.js';
-import { textParser } from '../middleware/formdataParser.js';
-import { Like } from '../controller/likeController.js';
-import { validate } from '../middleware/validate.js';
-import { ProductIdParams } from '../structs/productStruct.js';
-import { ArticleIdParams } from '../structs/articleStruct.js';
+import { tryCatchHandler } from '../middleware/errorhandler';
+import { authenticate } from '../middleware/authenticate';
+import { textParser } from '../middleware/formdataParser';
+import { Like } from '../controller/likeController';
+import { validate } from '../middleware/validate';
+import { ProductIdParams } from '../structs/productStruct';
+import { ArticleIdParams } from '../structs/articleStruct';
 export const likeRouter = express.Router();
 
 likeRouter.post(

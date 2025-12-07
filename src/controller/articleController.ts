@@ -1,13 +1,13 @@
-import { prisma } from '../utils/prismaClient.js';
+import { prisma } from '../utils/prismaClient';
 import { Request, Response } from 'express';
 import type {
   ArticleIdParamsType,
   CreateArticleType,
   GetArticlesQueryType,
   PatchArticleType,
-} from '../structs/articleStruct.js';
-import { ArticleIdParams } from '../structs/articleStruct.js';
-import { HttpError } from '../utils/errors.js';
+} from '../structs/articleStruct';
+import { ArticleIdParams } from '../structs/articleStruct';
+import { HttpError } from '../utils/errors';
 
 export class ArticleController {
   //게시글 목록 조회

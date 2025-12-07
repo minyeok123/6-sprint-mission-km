@@ -1,18 +1,18 @@
 import express from 'express';
-import { validate } from '../middleware/validate.js';
+import { validate } from '../middleware/validate';
 import {
   CreateProduct,
   GetProductsQuery,
   PatchProduct,
   ProductIdParams,
-} from '../structs/productStruct.js';
-import { CreateProductComment } from '../structs/commentStruct.js';
-import { tryCatchHandler } from '../middleware/errorhandler.js';
-import { ProductController } from '../controller/productController.js';
-import { UploadImage, textParser } from '../middleware/formdataParser.js';
-import { authenticate } from '../middleware/authenticate.js';
-import { productValidate } from '../middleware/productValidate.js';
-import { commentController } from '../controller/commentController.js';
+} from '../structs/productStruct';
+import { CreateProductComment } from '../structs/commentStruct';
+import { tryCatchHandler } from '../middleware/errorhandler';
+import { ProductController } from '../controller/productController';
+import { UploadImage, textParser } from '../middleware/formdataParser';
+import { authenticate } from '../middleware/authenticate';
+import { productValidate } from '../middleware/productValidate';
+import { commentController } from '../controller/commentController';
 // const app = express();
 // app.use(express.json()); >> app.js에 이미 있음
 
