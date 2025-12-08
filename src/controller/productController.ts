@@ -4,6 +4,7 @@ import {
   PatchProductType,
   ProductIdParams,
 } from '../structs/productStruct';
+import { UserIdParams } from '../structs/userStruct';
 import { HttpError } from '../utils/errors';
 import { prisma } from '../utils/prismaClient';
 import { Request, Response } from 'express';
@@ -134,5 +135,48 @@ export class ProductController {
     });
 
     res.sendStatus(204);
+  };
+  //게시 상품 조회
+  static getCreatedProduct = async (req: Request, res: Response) => {
+    const { userId } = UserIdParams.create(req.params);
+    const user = req.user;
+    if (!user) {
+      throw new HttpError(401, '잘못된 접근입니다.');
+    }
+
+    const product = await prisma.$transaction(async (tx) => {
+      const foundUser = await tx.user.findUnique({ where: { id: userId } });
+      if (!foundUser) {
+        throw new HttpError(401, '회원을 찾을 수 없습니다.');
+      }
+      if (foundUser.id !== user.id) {
+        throw new HttpError(401, '잘못된 접근입니다.');
+      }
+      const createdProduct = await tx.product.findMany({
+        where: { userId: userId },
+      });
+      if (!createdProduct) {
+        throw new HttpError(401, '등록된 상품을 찾을 수 없습니다.');
+      }
+      return createdProduct;
+    });
+    res.status(200).send(product);
+  };
+
+  //좋아요 상품 조회
+  static getLikedProduct = async (req: Request, res: Response) => {
+    const { userId } = UserIdParams.create(req.params);
+    const user = req.user;
+    if (!user) {
+      return res.status(401).send({ message: '잘못된 접근입니다.' });
+    }
+    if (userId !== user.id) {
+      return res.status(401).send({ message: '접근 권한이 없습니다.' });
+    }
+
+    const likedProduct = await prisma.product.findMany({
+      where: { like: { some: { userId: userId } } },
+    });
+    res.status(200).send(likedProduct);
   };
 }

@@ -48,20 +48,6 @@ authRouter
     validate(UserIdParams, 'params'),
     validate(PatchPassword),
     tryCatchHandler(AuthController.updatePassword),
-  )
-  .get(
-    '/:userId/products',
-    authenticate,
-    profileUpload.none(),
-    validate(UserIdParams, 'params'),
-    tryCatchHandler(AuthController.getCreatedProduct),
-  )
-  .get(
-    '/:userId/liked-products',
-    authenticate,
-    profileUpload.none(),
-    validate(UserIdParams, 'params'),
-    tryCatchHandler(AuthController.getLikedProduct),
   );
 
 export default authRouter;
