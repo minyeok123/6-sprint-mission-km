@@ -8,101 +8,48 @@ import type {
 } from '../structs/articleStruct';
 import { ArticleIdParams } from '../structs/articleStruct';
 import { HttpError } from '../utils/errors';
+import { ArticleService } from '../service/articleService';
+import { ArticleRepository } from '../repository/articleRepository';
+
+const articleRepository = new ArticleRepository();
+const articleService = new ArticleService(articleRepository);
 
 export class ArticleController {
   //게시글 목록 조회
   static getArticles = async (req: Request, res: Response) => {
-    const { page = 1, limit = 10, order, search } = req.query as GetArticlesQueryType;
-
-    const orderByOption = {
-      recent: { createdAt: 'desc' },
-      oldest: { createdAt: 'asc' },
-    } as const;
-
-    const where = search
-      ? { OR: [{ title: { contains: search } }, { content: { contains: search } }] }
-      : undefined;
-
-    const article = await prisma.article.findMany({
-      where,
-      orderBy:
-        order && (order === 'recent' || order === 'oldest')
-          ? orderByOption[order]
-          : orderByOption['recent'],
-      skip: (page - 1) * limit,
-      take: limit,
-      select: { id: true, title: true, content: true, createdAt: true },
-    });
+    const query = req.query as GetArticlesQueryType;
+    const article = await articleService.getArticles(query);
     res.status(200).send(article);
   };
+
   //게시글 생성
   static createArticle = async (req: Request, res: Response) => {
-    const { title, content } = req.body as CreateArticleType;
-    const articleImage = req.files;
+    const articleData = req.body as CreateArticleType;
+    const articleImage = req.files as Express.Multer.File[];
     const user = req.user;
     if (!user) {
       throw new HttpError(401, '인증 정보가 없습니다.');
     }
-    let image;
-    if (Array.isArray(articleImage) && articleImage.length > 0) {
-      image = {
-        create: articleImage.map((file) => ({
-          url: `/files/article-image/${file.filename}`,
-        })),
-      };
-    }
-    const article = await prisma.article.create({
-      data: {
-        title,
-        content,
-        user: { connect: { id: user.id } },
-        articleImages: image,
-      },
-    });
+    const article = await articleService.createArticle(articleData, user, articleImage);
     res.status(201).send(article);
   };
+
   //게시글 상세 조회
   static getArticleDetail = async (req: Request, res: Response) => {
     const { articleId } = ArticleIdParams.create(req.params);
-    const article = await prisma.article.findUniqueOrThrow({
-      where: { id: articleId },
-      select: {
-        id: true,
-        title: true,
-        content: true,
-        createdAt: true,
-        _count: { select: { like: true } },
-      },
-    });
-    const response = {
-      ...article,
-      isLiked: article['_count'].like > 0,
-    };
-    res.status(200).send(response);
+    const article = await articleService.getArticleDetail(articleId);
+
+    res.status(200).send(article);
   };
   //게시글 수정
   static patchArticle = async (req: Request, res: Response) => {
     const { articleId } = ArticleIdParams.create(req.params);
-    const { title, content } = req.body as PatchArticleType;
+    const articleData = req.body as PatchArticleType;
     const user = req.user;
     if (!user) {
       throw new HttpError(401, '인증 정보가 없습니다.');
     }
-    const article = await prisma.$transaction(async (tx) => {
-      const foundArticle = await tx.article.findUniqueOrThrow({ where: { id: articleId } });
-      if (foundArticle.userId !== user.id) {
-        throw new HttpError(401, '잘못된 접근입니다.');
-      }
-      const patchedArticle = await tx.article.update({
-        where: { id: articleId },
-        data: {
-          title,
-          content,
-        },
-      });
-      return patchedArticle;
-    });
-
+    const article = await articleService.patchArticle(articleId, articleData, user);
     res.status(200).send(article);
   };
   //게시글 삭제
@@ -112,16 +59,7 @@ export class ArticleController {
     if (!user) {
       throw new HttpError(401, '인증 정보가 없습니다.');
     }
-    await prisma.$transaction(async (tx) => {
-      const foundArticle = await tx.article.findUniqueOrThrow({
-        where: { id: articleId },
-      });
-      if (foundArticle.userId !== user.id) {
-        throw new HttpError(401, '잘못된 접근입니다.');
-      }
-      await tx.article.delete({ where: { id: articleId } });
-    });
-
+    await articleService.deleteArticle(articleId, user);
     res.sendStatus(204);
   };
 }
