@@ -14,6 +14,7 @@ import {
 import { HttpError } from '../utils/errors';
 import { AuthService } from '../service/authService';
 import { AuthRepository } from '../repository/authRepository';
+import { User } from '@prisma/client';
 
 const authRepository = new AuthRepository();
 const authService = new AuthService(authRepository);
@@ -53,10 +54,7 @@ export class AuthController {
   // 유저 정보 상세조회
   static getInfo = async (req: Request, res: Response) => {
     const { userId } = UserIdParams.create(req.params);
-    const user = req.user;
-    if (!user) {
-      throw new HttpError(401, '잘못된 접근입니다.');
-    }
+    const user = req.user as User;
     const userInfo = await authService.getInfo(userId);
     if (!userInfo) {
       throw new HttpError(401, '회원 정보를 찾을수 없습니다.');
@@ -71,10 +69,7 @@ export class AuthController {
   static patchInfo = async (req: Request, res: Response) => {
     const { userId } = UserIdParams.create(req.params);
     const data = req.body as PatchUserType;
-    const user = req.user;
-    if (!user) {
-      throw new HttpError(401, '잘못된 접근입니다.');
-    }
+    const user = req.user as User;
     const patchUser = await authService.patchInfo(userId, data, user);
     res.status(201).send(patchUser);
   };
@@ -83,11 +78,7 @@ export class AuthController {
   static updatePassword = async (req: Request, res: Response) => {
     const { userId } = UserIdParams.create(req.params);
     const data = req.body as PatchPasswordType;
-    const user = req.user;
-    if (!user) {
-      throw new HttpError(401, '잘못된 접근입니다.');
-    }
-
+    const user = req.user as User;
     await authService.updatePassword(userId, data, user);
 
     res.status(201).send({ message: '비밀번호 변경이 완료 되었습니다.' });
