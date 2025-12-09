@@ -31,7 +31,7 @@ authRouter
     '/:userId',
     authenticate,
     validate(UserIdParams, 'params'),
-    tryCatchHandler(AuthController.getInfo),
+    tryCatchHandler(AuthController.userInfo),
   )
   .patch(
     '/:userId',
@@ -48,6 +48,12 @@ authRouter
     validate(UserIdParams, 'params'),
     validate(PatchPassword),
     tryCatchHandler(AuthController.updatePassword),
+  )
+  .delete(
+    '/:userId',
+    authenticate,
+    validate(UserIdParams, 'params'),
+    tryCatchHandler(AuthController.deleteAccount),
   );
 
 export default authRouter;

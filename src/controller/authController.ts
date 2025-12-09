@@ -52,16 +52,10 @@ export class AuthController {
   };
 
   // 유저 정보 상세조회
-  static getInfo = async (req: Request, res: Response) => {
+  static userInfo = async (req: Request, res: Response) => {
     const { userId } = UserIdParams.create(req.params);
     const user = req.user as User;
-    const userInfo = await authService.getInfo(userId);
-    if (!userInfo) {
-      throw new HttpError(401, '회원 정보를 찾을수 없습니다.');
-    }
-    if (userInfo.id !== user.id) {
-      throw new HttpError(401, '잘못된 접근입니다.');
-    }
+    const userInfo = await authService.userInfo(userId, user);
     res.status(200).send(userInfo);
   };
 
@@ -82,5 +76,13 @@ export class AuthController {
     await authService.updatePassword(userId, data, user);
 
     res.status(201).send({ message: '비밀번호 변경이 완료 되었습니다.' });
+  };
+
+  //회원 탈퇴
+  static deleteAccount = async (req: Request, res: Response) => {
+    const { userId } = UserIdParams.create(req.params);
+    const user = req.user as User;
+    await authService.deleteAccount(userId, user);
+    res.sendStatus(204);
   };
 }

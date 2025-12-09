@@ -11,4 +11,7 @@ export class AuthRepository {
   async update(options: Prisma.UserUpdateArgs) {
     return await prisma.user.update(options);
   }
+  async delete(options: Prisma.UserDeleteArgs) {
+    return await prisma.user.delete(options);
+  }
 }

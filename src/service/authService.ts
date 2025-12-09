@@ -9,7 +9,6 @@ import {
 } from '../structs/userStruct';
 import bcrypt from 'bcrypt';
 import { generateTokens, verifyRefreshToken } from '../utils/token';
-import { clearTokenCookies, setTokenCookies } from '../utils/cookies';
 
 export class AuthService {
   constructor(private authRepository: AuthRepository) {}
@@ -69,7 +68,7 @@ export class AuthService {
     return { accessToken, newRefreshToken };
   }
 
-  async getInfo(id: number) {
+  async userInfo(id: number, user: User) {
     const userId = id;
     const getInfoOption = {
       where: { id: userId },
@@ -86,8 +85,15 @@ export class AuthService {
         },
       },
     };
-    const getInfo = await this.authRepository.findUnique(getInfoOption);
-    return getInfo;
+    const userInfo = await this.authRepository.findUnique(getInfoOption);
+    if (!userInfo) {
+      throw new HttpError(404, '회원 정보를 찾을수 없습니다.');
+    }
+    if (userInfo.id !== user.id) {
+      throw new HttpError(403, '자신의 정보만 조회할 수 있습니다.');
+    }
+
+    return userInfo;
   }
 
   async patchInfo(id: number, data: PatchUserType, user: User) {
@@ -141,5 +147,13 @@ export class AuthService {
     };
 
     await this.authRepository.update(updatePasswordOption);
+  }
+
+  async deleteAccount(id: number, user: User) {
+    const userId = id;
+    if (userId !== user.id) {
+      throw new HttpError(403, '계정 삭제 권한이 없습니다.');
+    }
+    await this.authRepository.delete({ where: { id: userId } });
   }
 }
