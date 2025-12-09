@@ -10,119 +10,59 @@ import {
   GetCommentQueryType,
 } from '../structs/commentStruct';
 import { ProductIdParams } from '../structs/productStruct';
+import { CommentService } from '../service/commentService';
+import { CommentRepository } from '../repository/commentRepository';
+
+const commentRepository = new CommentRepository();
+const commentService = new CommentService(commentRepository);
+
 export class commentController {
   static createProductComment = async (req: Request, res: Response) => {
     const { productId } = ProductIdParams.create(req.params);
-    const { content } = req.body as CreateProductCommentType;
-
+    const data = req.body as CreateProductCommentType;
     const user = req.user;
     if (!user) {
       throw new HttpError(401, '잘못된 접근입니다.');
     }
-    const productComment = await prisma.comment.create({
-      data: {
-        content,
-        user: {
-          connect: {
-            // connect >> 레코드를 생성할때 원래 있는 부모 레코드의 필드를 참조,
-            // create  >> 포스트 요청시 부모 레코드가 새로 만들어져야 할때  그 필드를 참조할때
-            id: user.id,
-          },
-        },
-        product: {
-          connect: {
-            id: productId,
-          },
-        },
-      },
-      select: { id: true, content: true, createdAt: true, productId: true, userId: true },
-    });
+    const productComment = await commentService.createProductComment(productId, data, user);
     res.status(201).send(productComment);
   };
+
   static createArticleComment = async (req: Request, res: Response) => {
     const { articleId } = ArticleIdParams.create(req.params);
     const user = req.user;
     if (!user) {
       throw new HttpError(401, '잘못된 접근입니다.');
     }
-    const { content } = req.body as CreateArticleCommentType;
-    const articleComment = await prisma.comment.create({
-      data: {
-        content,
-        user: { connect: { id: user.id } },
-        article: { connect: { id: articleId } },
-      },
-      select: { id: true, content: true, createdAt: true, articleId: true, userId: true },
-    });
+    const data = req.body as CreateArticleCommentType;
+    const articleComment = await commentService.createArticleComment(articleId, data, user);
     res.status(201).send(articleComment);
   };
+
   static patchComment = async (req: Request, res: Response) => {
     const { commentId } = CommentIdParams.create(req.params);
-    const { content } = req.body as PatchCommentType;
+    const data = req.body as PatchCommentType;
     const user = req.user;
     if (!user) {
       throw new HttpError(401, '잘못된 접근입니다.');
     }
-
-    const comment = await prisma.$transaction(async (tx) => {
-      const foundComment = await tx.comment.findUniqueOrThrow({ where: { id: commentId } });
-      if (foundComment.userId !== user.id) {
-        throw new HttpError(401, '잘못된 접근입니다.');
-      }
-      const patchedComment = await tx.comment.update({
-        where: { id: commentId },
-        data: {
-          content,
-        },
-        select: {
-          id: true,
-          content: true,
-          createdAt: true,
-          productId: true,
-          articleId: true,
-          userId: true,
-        },
-      });
-      return patchedComment;
-    });
-    res.status(200).send(comment);
+    const patchedComment = await commentService.patchComment(commentId, data, user);
+    res.status(200).send(patchedComment);
   };
 
   static getAllComment = async (req: Request, res: Response) => {
-    const { limit = 10, cursorId } = req.query as GetCommentQueryType;
-    const orderBy = { createdAt: 'desc' } as const;
-    const comments = await prisma.comment.findMany({
-      cursor: cursorId ? { id: cursorId } : undefined,
-      skip: cursorId ? 1 : 0,
-      take: limit,
-      orderBy,
-      select: {
-        id: true,
-        content: true,
-        createdAt: true,
-      },
-    });
-    let nextCursor = null;
-    if (comments.length === limit) {
-      nextCursor = comments[comments.length - 1].id;
-    }
-
+    const query = req.query as GetCommentQueryType;
+    const { comments, nextCursor } = await commentService.getAllComment(query);
     res.status(200).send({ comments, nextCursor });
   };
+
   static deleteComment = async (req: Request, res: Response) => {
     const { commentId } = CommentIdParams.create(req.params);
     const user = req.user;
     if (!user) {
       throw new HttpError(401, '잘못된 접근입니다.');
     }
-
-    await prisma.$transaction(async (tx) => {
-      const foundComment = await tx.comment.findUniqueOrThrow({ where: { id: commentId } });
-      if (foundComment.userId !== user.id) {
-        throw new HttpError(401, '잘못된 접근입니다.');
-      }
-      await tx.comment.delete({ where: { id: commentId } });
-    });
+    await commentService.deleteComment(commentId, user);
     res.sendStatus(204);
   };
 }
