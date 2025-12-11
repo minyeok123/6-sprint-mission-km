@@ -34,7 +34,7 @@ authRouter
     tryCatchHandler(AuthController.userInfo),
   )
   .patch(
-    '/:userId',
+    '/:userId/update-info',
     authenticate,
     profileUpload.none(),
     validate(UserIdParams, 'params'),
@@ -50,7 +50,7 @@ authRouter
     tryCatchHandler(AuthController.updatePassword),
   )
   .delete(
-    '/:userId',
+    '/:userId/delete-account',
     authenticate,
     validate(UserIdParams, 'params'),
     tryCatchHandler(AuthController.deleteAccount),

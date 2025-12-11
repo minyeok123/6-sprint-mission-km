@@ -6,13 +6,11 @@ import {
   PatchProduct,
   ProductIdParams,
 } from '../structs/productStruct';
-import { CreateProductComment } from '../structs/commentStruct';
 import { tryCatchHandler } from '../middleware/errorhandler';
 import { ProductController } from '../controller/productController';
 import { UploadImage, textParser } from '../middleware/formdataParser';
 import { authenticate } from '../middleware/authenticate';
 import { productValidate } from '../middleware/productValidate';
-import { commentController } from '../controller/commentController';
 import { UserIdParams } from '../structs/userStruct';
 // const app = express();
 // app.use(express.json()); >> app.js에 이미 있음
@@ -47,16 +45,6 @@ productRouter
     authenticate,
     validate(ProductIdParams, 'params'),
     tryCatchHandler(ProductController.deleteProduct),
-  );
-//중고마켓 댓글 작성
-productRouter
-  .route('/:productId/comments')
-  .post(
-    authenticate,
-    textParser,
-    validate(ProductIdParams, 'params'),
-    validate(CreateProductComment),
-    tryCatchHandler(commentController.createProductComment),
   );
 
 productRouter

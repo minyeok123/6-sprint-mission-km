@@ -1,7 +1,5 @@
 import { ArticleIdParams } from '../structs/articleStruct';
 import { ProductIdParams } from '../structs/productStruct';
-import { HttpError } from '../utils/errors';
-import { prisma } from '../utils/prismaClient';
 import { Request, Response } from 'express';
 import { LikeRepository } from '../repository/likeRepository';
 import { LikeService } from '../service/likeService';

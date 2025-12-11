@@ -1,13 +1,10 @@
-import { prisma } from '../utils/prismaClient';
 import { Request, Response } from 'express';
 import type {
-  ArticleIdParamsType,
   CreateArticleType,
   GetArticlesQueryType,
   PatchArticleType,
 } from '../structs/articleStruct';
 import { ArticleIdParams } from '../structs/articleStruct';
-import { HttpError } from '../utils/errors';
 import { ArticleService } from '../service/articleService';
 import { ArticleRepository } from '../repository/articleRepository';
 import { User } from '@prisma/client';

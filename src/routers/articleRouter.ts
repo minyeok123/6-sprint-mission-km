@@ -44,14 +44,5 @@ articleRouter
   );
 
 //자유게시판 댓글 생성
-articleRouter
-  .route('/:articleId/comments')
-  .post(
-    authenticate,
-    textParser,
-    validate(ArticleIdParams, 'params'),
-    validate(CreateArticleComment),
-    tryCatchHandler(commentController.createArticleComment),
-  );
 
 export default articleRouter;

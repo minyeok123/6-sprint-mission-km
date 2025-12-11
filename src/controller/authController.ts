@@ -1,9 +1,6 @@
-import { prisma } from '../utils/prismaClient';
-import bcrypt from 'bcrypt';
-import { generateTokens, verifyRefreshToken } from '../utils/token';
 import { clearTokenCookies, setTokenCookies } from '../utils/cookies';
-import { JWT_ACCESS_TOKEN_SECRET, REFRESH_TOKEN_COOKIE_NAME } from '../utils/constants';
-import { Request, Response, NextFunction } from 'express';
+import { REFRESH_TOKEN_COOKIE_NAME } from '../utils/constants';
+import { Request, Response } from 'express';
 import {
   CreateUserType,
   LoginUserType,
@@ -11,7 +8,6 @@ import {
   PatchUserType,
   UserIdParams,
 } from '../structs/userStruct';
-import { HttpError } from '../utils/errors';
 import { AuthService } from '../service/authService';
 import { AuthRepository } from '../repository/authRepository';
 import { User } from '@prisma/client';

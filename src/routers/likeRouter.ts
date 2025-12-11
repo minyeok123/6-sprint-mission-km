@@ -1,25 +1,24 @@
-import express, { Router } from 'express';
+import express from 'express';
 import { tryCatchHandler } from '../middleware/errorhandler';
 import { authenticate } from '../middleware/authenticate';
-import { textParser } from '../middleware/formdataParser';
-import { Like } from '../controller/likeController';
+import { LikeController } from '../controller/likeController';
 import { validate } from '../middleware/validate';
 import { ProductIdParams } from '../structs/productStruct';
 import { ArticleIdParams } from '../structs/articleStruct';
 export const likeRouter = express.Router();
 
 likeRouter.post(
-  '/productLike/:productId',
+  '/:productId/productLike',
   validate(ProductIdParams, 'params'),
   authenticate,
-  tryCatchHandler(Like.toggleProductLike),
+  tryCatchHandler(LikeController.toggleProductLike),
 );
 
 likeRouter.post(
-  '/articleLike/:articleId',
+  '/:articleId/articleLike',
   validate(ArticleIdParams, 'params'),
   authenticate,
-  tryCatchHandler(Like.toggleArticleLike),
+  tryCatchHandler(LikeController.toggleArticleLike),
 );
 
 export default likeRouter;

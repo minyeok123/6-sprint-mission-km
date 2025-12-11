@@ -5,6 +5,10 @@ import { tryCatchHandler } from '../middleware/errorhandler';
 import { commentController } from '../controller/commentController';
 import { authenticate } from '../middleware/authenticate';
 import { textParser } from '../middleware/formdataParser';
+import { ProductIdParams } from '../structs/productStruct';
+import { CreateProductComment } from '../structs/commentStruct';
+import { ArticleIdParams } from '../structs/articleStruct';
+import { CreateArticleComment } from '../structs/commentStruct';
 const commentRouter = express.Router();
 
 //댓글 수정 및 삭제
@@ -21,6 +25,27 @@ commentRouter
     authenticate,
     validate(CommentIdParams, 'params'),
     tryCatchHandler(commentController.deleteComment),
+  );
+
+//상품 댓글 생성
+commentRouter
+  .route('/:productId/comments')
+  .post(
+    authenticate,
+    textParser,
+    validate(ProductIdParams, 'params'),
+    validate(CreateProductComment),
+    tryCatchHandler(commentController.createProductComment),
+  );
+//아티클 댓글 생성
+commentRouter
+  .route('/:articleId/comments')
+  .post(
+    authenticate,
+    textParser,
+    validate(ArticleIdParams, 'params'),
+    validate(CreateArticleComment),
+    tryCatchHandler(commentController.createArticleComment),
   );
 
 //모든 댓글 조회

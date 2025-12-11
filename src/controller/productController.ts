@@ -5,8 +5,6 @@ import {
   ProductIdParams,
 } from '../structs/productStruct';
 import { UserIdParams } from '../structs/userStruct';
-import { HttpError } from '../utils/errors';
-import { prisma } from '../utils/prismaClient';
 import { Request, Response } from 'express';
 import { ProductService } from '../service/productService';
 import { ProductRepository } from '../repository/productRepository';

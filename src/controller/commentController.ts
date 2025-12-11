@@ -1,7 +1,5 @@
 import { ArticleIdParams } from '../structs/articleStruct';
-import { prisma } from '../utils/prismaClient';
 import { Request, Response } from 'express';
-import { HttpError } from '../utils/errors';
 import {
   CreateArticleCommentType,
   CreateProductCommentType,
