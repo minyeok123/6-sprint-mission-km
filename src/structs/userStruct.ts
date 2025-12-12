@@ -1,7 +1,7 @@
 import * as s from 'superstruct';
 import isEmail from 'is-email';
 import type { Infer } from 'superstruct';
-import { IdParam, PaginationQuery, OrderQuery } from './commonStruct';
+import { PaginationQuery, OrderQuery } from './commonStruct';
 
 const emailValidator = (value: unknown): value is string => {
   return typeof value === 'string' && isEmail(value);
@@ -30,7 +30,9 @@ export const PatchPassword = s.object({
 });
 export type PatchPasswordType = Infer<typeof PatchPassword>;
 
-export const UserIdParams = IdParam('userId');
+export const UserIdParams = s.object({
+  userId: s.integer(),
+});
 export type UserIdParamsType = Infer<typeof UserIdParams>;
 
 export const GetUserQuery = s.intersection([PaginationQuery, OrderQuery]);

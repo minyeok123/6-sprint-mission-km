@@ -1,12 +1,19 @@
-import { assert, Struct } from 'superstruct';
+import { create, Struct } from 'superstruct';
 import { Request, Response, NextFunction } from 'express';
 
 type RequestSource = 'body' | 'params' | 'query';
-
+export type ValidatedParamsRequest<T> = Request & {
+  validatedParams: T;
+};
 export function validate<T, S>(struct: Struct<T, S>, source: RequestSource = 'body') {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
-      assert(req[source], struct);
+      const validated = create(req[source], struct);
+      if (source === 'params') {
+        (req as ValidatedParamsRequest<T>).validatedParams = validated;
+      } else {
+        req[source] = validated;
+      }
       next();
     } catch (e) {
       next(e);

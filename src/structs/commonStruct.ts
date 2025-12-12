@@ -1,14 +1,6 @@
 import * as s from 'superstruct';
 import type { Infer } from 'superstruct';
 
-export const IdParam = (key: string = 'id') =>
-  s.object({
-    [key]: s.coerce(s.integer(), s.string(), (val) => {
-      const num = parseInt(val, 10);
-      return isNaN(num) ? undefined : num;
-    }),
-  });
-
 //PageNation쿼리 정의 및 타입 정의
 export const PaginationQuery = s.object({
   page: s.optional(s.coerce(s.min(s.integer(), 1), s.string(), (val) => parseInt(val, 10))),

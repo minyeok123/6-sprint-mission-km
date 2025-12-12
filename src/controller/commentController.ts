@@ -1,23 +1,24 @@
-import { ArticleIdParams } from '../structs/articleStruct';
+import { ArticleIdParamsType } from '../structs/articleStruct';
 import { Request, Response } from 'express';
 import {
   CreateArticleCommentType,
   CreateProductCommentType,
   PatchCommentType,
-  CommentIdParams,
+  CommentIdParamsType,
   GetCommentQueryType,
 } from '../structs/commentStruct';
-import { ProductIdParams } from '../structs/productStruct';
+import { ProductIdParamsType } from '../structs/productStruct';
 import { CommentService } from '../service/commentService';
 import { CommentRepository } from '../repository/commentRepository';
 import { User } from '@prisma/client';
+import { ValidatedParamsRequest } from '../middleware/validate';
 
 const commentRepository = new CommentRepository();
 const commentService = new CommentService(commentRepository);
 
 export class commentController {
   static createProductComment = async (req: Request, res: Response) => {
-    const { productId } = ProductIdParams.create(req.params);
+    const { productId } = (req as ValidatedParamsRequest<ProductIdParamsType>).validatedParams;
     const data = req.body as CreateProductCommentType;
     const user = req.user as User;
     const productComment = await commentService.createProductComment(productId, data, user);
@@ -25,7 +26,7 @@ export class commentController {
   };
 
   static createArticleComment = async (req: Request, res: Response) => {
-    const { articleId } = ArticleIdParams.create(req.params);
+    const { articleId } = (req as ValidatedParamsRequest<ArticleIdParamsType>).validatedParams;
     const user = req.user as User;
     const data = req.body as CreateArticleCommentType;
     const articleComment = await commentService.createArticleComment(articleId, data, user);
@@ -33,7 +34,7 @@ export class commentController {
   };
 
   static patchComment = async (req: Request, res: Response) => {
-    const { commentId } = CommentIdParams.create(req.params);
+    const { commentId } = (req as ValidatedParamsRequest<CommentIdParamsType>).validatedParams;
     const data = req.body as PatchCommentType;
     const user = req.user as User;
     const patchedComment = await commentService.patchComment(commentId, data, user);
@@ -47,7 +48,7 @@ export class commentController {
   };
 
   static deleteComment = async (req: Request, res: Response) => {
-    const { commentId } = CommentIdParams.create(req.params);
+    const { commentId } = (req as ValidatedParamsRequest<CommentIdParamsType>).validatedParams;
     const user = req.user as User;
     await commentService.deleteComment(commentId, user);
     res.sendStatus(204);

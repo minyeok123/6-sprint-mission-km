@@ -6,8 +6,9 @@ import {
   LoginUserType,
   PatchPasswordType,
   PatchUserType,
-  UserIdParams,
+  UserIdParamsType,
 } from '../structs/userStruct';
+import { ValidatedParamsRequest } from '../middleware/validate';
 import { AuthService } from '../service/authService';
 import { AuthRepository } from '../repository/authRepository';
 import { User } from '@prisma/client';
@@ -49,7 +50,7 @@ export class AuthController {
 
   // 유저 정보 상세조회
   static userInfo = async (req: Request, res: Response) => {
-    const { userId } = UserIdParams.create(req.params);
+    const { userId } = (req as ValidatedParamsRequest<UserIdParamsType>).validatedParams;
     const user = req.user as User;
     const userInfo = await authService.userInfo(userId, user);
     res.status(200).send(userInfo);
@@ -57,7 +58,7 @@ export class AuthController {
 
   //유저 정보 수정
   static patchInfo = async (req: Request, res: Response) => {
-    const { userId } = UserIdParams.create(req.params);
+    const { userId } = (req as ValidatedParamsRequest<UserIdParamsType>).validatedParams;
     const data = req.body as PatchUserType;
     const user = req.user as User;
     const patchUser = await authService.patchInfo(userId, data, user);
@@ -66,7 +67,7 @@ export class AuthController {
 
   //비밀번호 변경
   static updatePassword = async (req: Request, res: Response) => {
-    const { userId } = UserIdParams.create(req.params);
+    const { userId } = (req as ValidatedParamsRequest<UserIdParamsType>).validatedParams;
     const data = req.body as PatchPasswordType;
     const user = req.user as User;
     await authService.updatePassword(userId, data, user);
@@ -76,7 +77,7 @@ export class AuthController {
 
   //회원 탈퇴
   static deleteAccount = async (req: Request, res: Response) => {
-    const { userId } = UserIdParams.create(req.params);
+    const { userId } = (req as ValidatedParamsRequest<UserIdParamsType>).validatedParams;
     const user = req.user as User;
     await authService.deleteAccount(userId, user);
     res.sendStatus(204);

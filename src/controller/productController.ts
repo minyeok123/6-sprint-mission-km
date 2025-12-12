@@ -2,14 +2,14 @@ import {
   CreateProductType,
   GetProductsQueryType,
   PatchProductType,
-  ProductIdParams,
+  ProductIdParamsType,
 } from '../structs/productStruct';
 import { UserIdParams } from '../structs/userStruct';
 import { Request, Response } from 'express';
 import { ProductService } from '../service/productService';
 import { ProductRepository } from '../repository/productRepository';
 import { User } from '@prisma/client';
-
+import { ValidatedParamsRequest } from '../middleware/validate';
 const productRepository = new ProductRepository();
 const productService = new ProductService(productRepository);
 
@@ -32,14 +32,14 @@ export class ProductController {
 
   //상품 상세 조회
   static getProductDetail = async (req: Request, res: Response) => {
-    const { productId } = ProductIdParams.create(req.params);
+    const { productId } = (req as ValidatedParamsRequest<ProductIdParamsType>).validatedParams;
     const product = await productService.getProductDetail(productId);
     res.status(200).send(product);
   };
 
   //상품 정보 수정
   static patchProduct = async (req: Request, res: Response) => {
-    const { productId } = ProductIdParams.create(req.params);
+    const { productId } = (req as ValidatedParamsRequest<ProductIdParamsType>).validatedParams;
     const data = req.body as PatchProductType;
     const user = req.user as User;
     const patchedProduct = await productService.patchProduct(productId, data, user);
@@ -48,7 +48,7 @@ export class ProductController {
 
   //상품 삭제
   static deleteProduct = async (req: Request, res: Response) => {
-    const { productId } = ProductIdParams.create(req.params);
+    const { productId } = (req as ValidatedParamsRequest<ProductIdParamsType>).validatedParams;
     const user = req.user as User;
     await productService.deleteProduct(productId, user);
     res.sendStatus(204);
