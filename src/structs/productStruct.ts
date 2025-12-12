@@ -1,6 +1,7 @@
 import * as s from 'superstruct';
 import type { Infer } from 'superstruct';
 import { PaginationQuery, SearchQuery, OrderQuery } from './commonStruct';
+import { NumberFromString } from './commonStruct';
 const TAGS = ['FASHION', 'ELECTRONICS', 'KITCHENWARE'] as const;
 
 export const CreateProduct = s.object({
@@ -16,7 +17,7 @@ export const PatchProduct = s.partial(CreateProduct);
 export type PatchProductType = Infer<typeof PatchProduct>;
 
 export const ProductIdParams = s.object({
-  productId: s.integer(),
+  productId: NumberFromString,
 });
 export type ProductIdParamsType = Infer<typeof ProductIdParams>;
 

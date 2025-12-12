@@ -19,3 +19,7 @@ export const OrderQuery = s.object({
   order: s.optional(s.enums(['recent', 'oldest'])),
 });
 export type OrderType = Infer<typeof OrderQuery>;
+
+export const NumberFromString = s.coerce(s.number(), s.string(), (value: string) =>
+  parseInt(value, 10),
+);

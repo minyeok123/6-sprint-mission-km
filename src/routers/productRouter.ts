@@ -46,7 +46,7 @@ productRouter
     validate(ProductIdParams, 'params'),
     tryCatchHandler(ProductController.deleteProduct),
   );
-
+//좋아요 및 게시 상품 조회
 productRouter
   .get(
     '/users/:userId/products',

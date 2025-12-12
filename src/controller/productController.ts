@@ -4,7 +4,7 @@ import {
   PatchProductType,
   ProductIdParamsType,
 } from '../structs/productStruct';
-import { UserIdParams } from '../structs/userStruct';
+import { UserIdParamsType } from '../structs/userStruct';
 import { Request, Response } from 'express';
 import { ProductService } from '../service/productService';
 import { ProductRepository } from '../repository/productRepository';
@@ -56,7 +56,7 @@ export class ProductController {
 
   //게시 상품 조회
   static getCreatedProduct = async (req: Request, res: Response) => {
-    const { userId } = UserIdParams.create(req.params);
+    const { userId } = (req as ValidatedParamsRequest<UserIdParamsType>).validatedParams;
     const user = req.user as User;
     const createdProduct = await productService.getCreatedProduct(userId, user);
     res.status(200).send(createdProduct);
@@ -64,7 +64,7 @@ export class ProductController {
 
   //좋아요 상품 조회
   static getLikedProduct = async (req: Request, res: Response) => {
-    const { userId } = UserIdParams.create(req.params);
+    const { userId } = (req as ValidatedParamsRequest<UserIdParamsType>).validatedParams;
     const user = req.user as User;
     const likedProduct = await productService.getLikedProduct(userId, user);
     res.status(200).send(likedProduct);

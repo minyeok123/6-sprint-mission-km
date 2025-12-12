@@ -29,7 +29,7 @@ commentRouter
 
 //상품 댓글 생성
 commentRouter
-  .route('/:productId/comments')
+  .route('/:productId/product-comments')
   .post(
     authenticate,
     textParser,
@@ -39,7 +39,7 @@ commentRouter
   );
 //아티클 댓글 생성
 commentRouter
-  .route('/:articleId/comments')
+  .route('/:articleId/article-comments')
   .post(
     authenticate,
     textParser,

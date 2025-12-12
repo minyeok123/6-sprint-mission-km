@@ -1,7 +1,7 @@
 import * as s from 'superstruct';
 import type { Infer } from 'superstruct';
 import { PaginationQuery, SearchQuery, OrderQuery } from './commonStruct';
-
+import { NumberFromString } from './commonStruct';
 export const CreateArticle = s.object({
   title: s.size(s.string(), 1, 30),
   content: s.size(s.string(), 1, 100),
@@ -12,7 +12,7 @@ export const PatchArticle = s.partial(CreateArticle);
 export type PatchArticleType = Infer<typeof PatchArticle>;
 
 export const ArticleIdParams = s.object({
-  articleId: s.integer(),
+  articleId: NumberFromString,
 });
 export type ArticleIdParamsType = Infer<typeof ArticleIdParams>;
 
