@@ -6,12 +6,11 @@ import {
   GetArticlesQuery,
   ArticleIdParams,
 } from '../structs/articleStruct';
-import { CreateArticleComment } from '../structs/commentStruct';
 import { tryCatchHandler } from '../middleware/errorhandler';
 import { ArticleController } from '../controller/articleController';
-import { UploadImage, textParser } from '../middleware/formdataParser';
+import { UploadImage } from '../middleware/formdataParser';
 import { authenticate } from '../middleware/authenticate';
-import { commentController } from '../controller/commentController';
+import { UserIdParams } from '../structs/userStruct';
 const articleRouter = express.Router();
 
 const articleImageUpload = UploadImage('article-image');
@@ -43,6 +42,18 @@ articleRouter
     tryCatchHandler(ArticleController.deleteArticle),
   );
 
-//자유게시판 댓글 생성
+articleRouter
+  .get(
+    '/users/:userId/created-articles',
+    authenticate,
+    validate(UserIdParams, 'params'),
+    tryCatchHandler(ArticleController.getCreatedArticle),
+  )
+  .get(
+    '/users/:userId/liked-articles',
+    authenticate,
+    validate(UserIdParams, 'params'),
+    tryCatchHandler(ArticleController.getLikedArticle),
+  );
 
 export default articleRouter;

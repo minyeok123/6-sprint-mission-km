@@ -107,4 +107,29 @@ export class ArticleService {
     }
     return this.articleRepository.delete({ where: { id: articleId } });
   }
+
+  async getCreatedArticle(id: number, user: User) {
+    const userId = id;
+
+    if (userId !== user.id) {
+      throw new HttpError(403, '자신이 등록한 상품만 조회할 수 있습니다.');
+    }
+    const createdArticle = await this.articleRepository.findMany({
+      where: { userId: userId },
+    });
+
+    return createdArticle;
+  }
+
+  async getLikedArticle(id: number, user: User) {
+    const userId = id;
+    if (userId !== user.id) {
+      throw new HttpError(403, '자신이 좋아요 한 상품만 조회할 수 있습니다.');
+    }
+    const likedArticle = await this.articleRepository.findMany({
+      where: { like: { some: { userId: userId } } },
+    });
+
+    return likedArticle;
+  }
 }

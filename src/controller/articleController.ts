@@ -9,6 +9,8 @@ import { ArticleRepository } from '../repository/articleRepository';
 import { User } from '@prisma/client';
 import { ArticleIdParamsType } from '../structs/articleStruct';
 import { ValidatedParamsRequest } from '../middleware/validate';
+import { UserIdParamsType } from '../structs/userStruct';
+
 const articleRepository = new ArticleRepository();
 const articleService = new ArticleService(articleRepository);
 
@@ -49,5 +51,20 @@ export class ArticleController {
     const user = req.user as User;
     await articleService.deleteArticle(articleId, user);
     res.sendStatus(204);
+  };
+
+  //생성 아티클 조회
+  static getCreatedArticle = async (req: Request, res: Response) => {
+    const { userId } = (req as ValidatedParamsRequest<UserIdParamsType>).validatedParams;
+    const user = req.user as User;
+    const createdArticle = await articleService.getCreatedArticle(userId, user);
+    res.status(200).send(createdArticle);
+  };
+  //좋아요 게시글 조회
+  static getLikedArticle = async (req: Request, res: Response) => {
+    const { userId } = (req as ValidatedParamsRequest<UserIdParamsType>).validatedParams;
+    const user = req.user as User;
+    const likedArticle = await articleService.getLikedArticle(userId, user);
+    res.status(200).send(likedArticle);
   };
 }
