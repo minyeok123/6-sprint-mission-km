@@ -126,7 +126,7 @@ export class ProductService {
               productId: productId,
             },
           });
-          io.to(String(liker.userId)).emit('notification', notification);
+          io.to(String(liker.userId)).emit('notification', { message: notification.message });
         }
       }
     }

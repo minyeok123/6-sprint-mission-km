@@ -51,7 +51,7 @@ export class CommentService {
         });
         
         const io = getIO();
-        io.to(String(article.userId)).emit('notification', notification);
+        io.to(String(article.userId)).emit('notification', { message: notification.message });
     }
 
     return comment;
