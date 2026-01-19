@@ -65,12 +65,12 @@ commentRouter
     tryCatchHandler(commentController.createArticleComment),
   );
 
-//상품 댓글 전체 조회 (Feed)
+//상품 댓글 전체 조회 
 commentRouter
   .route('/product-comments')
   .get(validate(GetCommentQuery, 'query'), tryCatchHandler(commentController.getProductComments));
 
-//아티클 댓글 전체 조회 (Feed)
+//아티클 댓글 전체 조회
 commentRouter
   .route('/article-comments')
   .get(validate(GetCommentQuery, 'query'), tryCatchHandler(commentController.getArticleComments));

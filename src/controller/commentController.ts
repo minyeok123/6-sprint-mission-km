@@ -50,16 +50,7 @@ export class commentController {
   };
 
   static getProductComments = async (req: Request, res: Response) => {
-    const query = req.query as GetCommentQueryType; // Assuming same query type
-    // If filtering by productId is needed via Params, we should take it from params.
-    // However, usually "get product comments" implies fetching for a specific product.
-    // The previous implementation was "get ALL comments system-wide". 
-    // If the intention is "get comments for ONE product", we need productId.
-    // Users query: "Product Article Comment Retrieval".
-    // Usually lists are associated with parent. 
-    // Let's assume for now this endpoint is "System-wide product comments feed" based on previous `getAllComments` logic.
-    // IF it is "get comments of a product", it should be under /products/:id/comments.
-    // Given the previous code `getAllComment` was a feed of ALL comments, `getProductComments` here likely means "Feed of all product comments".
+    const query = req.query as GetCommentQueryType;
     const { comments, nextCursor } = await commentService.getProductComments(query);
     res.status(200).send({ comments, nextCursor });
   };
