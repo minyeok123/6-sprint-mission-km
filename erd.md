@@ -89,7 +89,7 @@ DateTime updatedAt
         Int articleId FK "nullable"
     }
 
-d
+
 Comment {
 Int id PK
 String content

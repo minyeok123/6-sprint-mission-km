@@ -6,6 +6,7 @@ import {
   PatchProductType,
 } from '../structs/productStruct';
 import { HttpError } from '../utils/errors';
+
 export class ProductService {
   constructor(private productRepository: ProductRepository) {}
   async getProduct(query: GetProductsQueryType) {
