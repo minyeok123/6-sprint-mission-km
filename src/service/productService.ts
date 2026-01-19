@@ -43,7 +43,7 @@ export class ProductService {
   }
 
   async createProduct(data: CreateProductType, user: User, files?: Express.Multer.File[]) {
-    const { ...productData } = data;
+    const { tag, ...productData } = data;
     let image;
     if (Array.isArray(files) && files.length > 0) {
       image = {
@@ -52,10 +52,23 @@ export class ProductService {
         })),
       };
     }
+
+    let tagConnect;
+    if (tag) {
+      const existingTag = await this.productRepository.findFirstTag({ where: { tag } });
+      if (existingTag) {
+        tagConnect = { tag: { connect: { id: existingTag.id } } };
+      } else {
+        const newTag = await this.productRepository.createTag({ data: { tag } });
+        tagConnect = { tag: { connect: { id: newTag.id } } };
+      }
+    }
+
     const dataToSave = {
       data: {
         ...productData,
         productImages: image,
+        productTags: tagConnect ? { create: tagConnect } : undefined,
         user: { connect: { id: user.id } },
       },
     };
@@ -65,7 +78,7 @@ export class ProductService {
 
   async patchProduct(id: number, data: PatchProductType, user: User) {
     const productId = id;
-    const { ...productData } = data;
+    const { tag, ...productData } = data;
     const findProduct = await this.productRepository.findUniqueOrThrow({
       where: { id: productId },
       select: { userId: true },
@@ -73,9 +86,24 @@ export class ProductService {
     if (findProduct.userId !== user.id) {
       throw new HttpError(403, '상품을 수정할 권한이 없습니다.');
     }
+
+    let tagConnect;
+    if (tag) {
+      const existingTag = await this.productRepository.findFirstTag({ where: { tag } });
+      if (existingTag) {
+        tagConnect = { tag: { connect: { id: existingTag.id } } };
+      } else {
+        const newTag = await this.productRepository.createTag({ data: { tag } });
+        tagConnect = { tag: { connect: { id: newTag.id } } };
+      }
+    }
+
     const dataToUpdate = {
       where: { id: productId },
-      data: { ...productData },
+      data: { 
+        ...productData, 
+        productTags: tagConnect ? { deleteMany: {}, create: tagConnect } : undefined,
+      },
     };
     const patchedProduct = await this.productRepository.update(dataToUpdate);
     return patchedProduct;
@@ -90,14 +118,14 @@ export class ProductService {
         productName: true,
         description: true,
         price: true,
-        tag: true,
+        productTags: { select: { tag: true } },
         createdAt: true,
-        _count: { select: { like: true } },
+        _count: { select: { productLikes: true } },
       },
     };
     const product = await this.productRepository.findUniqueOrThrow(getProductOptions);
 
-    return { ...product, isLiked: product._count.like > 0 };
+    return { ...product, isLiked: product._count.productLikes > 0 };
   }
 
   async deleteProduct(id: number, user: User) {
@@ -135,7 +163,7 @@ export class ProductService {
       throw new HttpError(403, '자신이 좋아요 한 상품만 조회할 수 있습니다.');
     }
     const likedProduct = await this.productRepository.findMany({
-      where: { like: { some: { userId: userId } } },
+      where: { productLikes: { some: { userId: userId } } },
     });
 
     return likedProduct;

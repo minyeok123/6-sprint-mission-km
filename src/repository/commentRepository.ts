@@ -2,19 +2,37 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '../utils/prismaClient';
 
 export class CommentRepository {
-  async create(options: Prisma.CommentCreateArgs) {
-    return prisma.comment.create(options);
+  // Product Comment
+  async createProductComment(options: Prisma.ProductCommentCreateArgs) {
+    return prisma.productComment.create(options);
   }
-  async update(options: Prisma.CommentUpdateArgs) {
-    return prisma.comment.update(options);
+  async updateProductComment(options: Prisma.ProductCommentUpdateArgs) {
+    return prisma.productComment.update(options);
   }
-  async findMany(options: Prisma.CommentFindManyArgs) {
-    return prisma.comment.findMany(options);
+  async findManyProductComment(options: Prisma.ProductCommentFindManyArgs) {
+    return prisma.productComment.findMany(options);
   }
-  async findUnique(options: Prisma.CommentFindUniqueArgs) {
-    return prisma.comment.findUnique(options);
+  async findUniqueProductComment(options: Prisma.ProductCommentFindUniqueArgs) {
+    return prisma.productComment.findUnique(options);
   }
-  async delete(options: Prisma.CommentDeleteArgs) {
-    return prisma.comment.delete(options);
+  async deleteProductComment(options: Prisma.ProductCommentDeleteArgs) {
+    return prisma.productComment.delete(options);
+  }
+
+  // Article Comment
+  async createArticleComment(options: Prisma.ArticleCommentCreateArgs) {
+    return prisma.articleComment.create(options);
+  }
+  async updateArticleComment(options: Prisma.ArticleCommentUpdateArgs) {
+    return prisma.articleComment.update(options);
+  }
+  async findManyArticleComment(options: Prisma.ArticleCommentFindManyArgs) {
+    return prisma.articleComment.findMany(options);
+  }
+  async findUniqueArticleComment(options: Prisma.ArticleCommentFindUniqueArgs) {
+    return prisma.articleComment.findUnique(options);
+  }
+  async deleteArticleComment(options: Prisma.ArticleCommentDeleteArgs) {
+    return prisma.articleComment.delete(options);
   }
 }
