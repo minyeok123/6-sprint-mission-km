@@ -65,13 +65,13 @@ export class ArticleService {
         title: true,
         content: true,
         createdAt: true,
-        _count: { select: { like: true } },
+        _count: { select: { articleLikes: true } },
       },
     } as const;
 
     const article = await this.articleRepository.findUniqueOrThrow(findUniqueOption);
 
-    return { ...article, isLiked: article._count.like > 0 };
+    return { ...article, isLiked: article._count.articleLikes > 0 };
   }
 
   async patchArticle(id: number, body: PatchArticleType, user: User) {
@@ -127,7 +127,7 @@ export class ArticleService {
       throw new HttpError(403, '자신이 좋아요 한 상품만 조회할 수 있습니다.');
     }
     const likedArticle = await this.articleRepository.findMany({
-      where: { like: { some: { userId: userId } } },
+      where: { articleLikes: { some: { userId: userId } } },
     });
 
     return likedArticle;

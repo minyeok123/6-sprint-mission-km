@@ -6,6 +6,9 @@ import {
   PatchProductType,
 } from '../structs/productStruct';
 import { HttpError } from '../utils/errors';
+import { getIO } from '../socket';
+import { NotificationType } from '@prisma/client';
+import { prisma } from '../utils/prismaClient';
 
 export class ProductService {
   constructor(private productRepository: ProductRepository) {}
@@ -81,7 +84,7 @@ export class ProductService {
     const { tag, ...productData } = data;
     const findProduct = await this.productRepository.findUniqueOrThrow({
       where: { id: productId },
-      select: { userId: true },
+      select: { userId: true, price: true },
     });
     if (findProduct.userId !== user.id) {
       throw new HttpError(403, '상품을 수정할 권한이 없습니다.');
@@ -106,6 +109,28 @@ export class ProductService {
       },
     };
     const patchedProduct = await this.productRepository.update(dataToUpdate);
+
+    if (productData.price && productData.price !== findProduct.price) {
+      const likedUsers = await this.productRepository.findLikes({
+        where: { productId: productId },
+        select: { userId: true },
+      });
+      const io = getIO();
+      for (const liker of likedUsers) {
+        if (liker.userId !== user.id) {
+          const notification = await prisma.notification.create({
+            data: {
+              userId: liker.userId,
+              type: NotificationType.PRICE_CHANGE,
+              message: `관심 상품 '${patchedProduct.productName}'의 가격이 변동되었습니다.`,
+              productId: productId,
+            },
+          });
+          io.to(String(liker.userId)).emit('notification', notification);
+        }
+      }
+    }
+
     return patchedProduct;
   }
 

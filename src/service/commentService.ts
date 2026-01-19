@@ -7,6 +7,9 @@ import {
   PatchCommentType,
 } from '../structs/commentStruct';
 import { HttpError } from '../utils/errors';
+import { getIO } from '../socket';
+import { NotificationType } from '@prisma/client';
+import { prisma } from '../utils/prismaClient';
 export class CommentService {
   constructor(private commentRepository: CommentRepository) {}
 
@@ -35,7 +38,23 @@ export class CommentService {
       },
       select: { id: true, content: true, createdAt: true, articleId: true, userId: true },
     };
-    return this.commentRepository.createArticleComment(dataToSave);
+    const comment = await this.commentRepository.createArticleComment(dataToSave);
+    const article = await prisma.article.findUnique({ where: { id: articleId }, select: { userId: true, title: true } });
+    if (article && article.userId !== user.id) {
+        const notification = await prisma.notification.create({
+            data: {
+                userId: article.userId,
+                type: NotificationType.NEW_COMMENT,
+                message: `내 게시글 '${article.title}'에 새로운 댓글이 달렸습니다.`,
+                articleId: articleId,
+            }
+        });
+        
+        const io = getIO();
+        io.to(String(article.userId)).emit('notification', notification);
+    }
+
+    return comment;
   }
 
   async patchProductComment(id: number, data: PatchCommentType, user: User) {

@@ -28,4 +28,7 @@ export class ProductRepository {
   async createTag(options: Prisma.TagCreateArgs) {
     return prisma.tag.create(options);
   }
+  async findLikes(options: Prisma.ProductLikeFindManyArgs) {
+    return prisma.productLike.findMany(options);
+  }
 }

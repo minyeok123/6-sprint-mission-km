@@ -32,6 +32,7 @@ model User {
   productComment        ProductComment[]
   productInquiries      ProductInquiry[]
   productInquiryAnswers ProductInquiryAnswer[]
+  notifications         Notification[]
 
   @@map("users")
 }
@@ -100,6 +101,7 @@ model Product {
   productComments  ProductComment[]
   productTags      ProductWithTag[]
   productInquiries ProductInquiry[]
+  notifications    Notification[]
 
   @@map("products")
 }
@@ -176,6 +178,7 @@ model Article {
   articleImages   ArticleImage[]
   articleLikes    ArticleLike[]
   articleComments ArticleComment[]
+  notifications   Notification[]
 
   @@map("articles")
 }
@@ -246,4 +249,29 @@ model ProductComment {
 enum OrderStatus {
   PENDING
   COMPLETE
+}
+
+model Notification {
+  id      Int              @id @default(autoincrement())
+  userId  Int              @map("user_id")
+  message String
+  isRead  Boolean          @default(false) @map("is_read")
+  type    NotificationType
+
+  productId Int? @map("product_id")
+  articleId Int? @map("article_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  article Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  PRICE_CHANGE
+  NEW_COMMENT
 }

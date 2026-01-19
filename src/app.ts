@@ -1,5 +1,7 @@
 import 'express-async-errors';
 import express from 'express';
+import { createServer } from 'node:http';
+import { initSocket } from './socket';
 import productRouter from './routers/productRouter';
 import { PORT } from './utils/constants';
 import articleRouter from './routers/articleRouter';
@@ -16,6 +18,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/files', express.static('uploads'));
+app.use(express.static('public'));
+
 
 app.use(cors());
 
@@ -43,4 +47,7 @@ app.use('/like', likeRouter);
 //전역 에러핸들러
 app.use(errorHandler);
 
-app.listen(PORT || 3000, () => console.log('server started'));
+const httpServer = createServer(app);
+initSocket(httpServer);
+
+httpServer.listen(PORT || 3000, () => console.log('server started'));
