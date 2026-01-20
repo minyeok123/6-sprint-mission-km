@@ -252,17 +252,15 @@ enum OrderStatus {
 }
 
 model Notification {
-  id      Int              @id @default(autoincrement())
-  userId  Int              @map("user_id")
-  message String
-  isRead  Boolean          @default(false) @map("is_read")
-  type    NotificationType
-
-  productId Int? @map("product_id")
-  articleId Int? @map("article_id")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id        Int              @id @default(autoincrement())
+  userId    Int              @map("user_id")
+  message   String
+  isRead    Boolean          @default(false) @map("is_read")
+  productId Int?             @map("product_id")
+  articleId Int?             @map("article_id")
+  type      NotificationType
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
 
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)

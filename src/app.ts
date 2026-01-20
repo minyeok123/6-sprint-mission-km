@@ -13,6 +13,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRouter from './routers/authRouter';
 import likeRouter from './routers/likeRouter';
+import notificationRouter from './routers/notificationRouter';
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
@@ -43,6 +44,9 @@ app.use('/auth', authRouter);
 
 //좋아요
 app.use('/like', likeRouter);
+
+//알림
+app.use('/notifications', notificationRouter);
 
 //전역 에러핸들러
 app.use(errorHandler);
