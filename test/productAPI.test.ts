@@ -1,12 +1,12 @@
 import request from 'supertest';
 import app from '../src/app';
 import { prisma } from '../src/utils/prismaClient';
-import { connect } from 'http2';
 
 const agent = request.agent(app);
 
 describe('인증이 필요하지 않은 상품 API 테스트', () => {
   beforeAll(async () => {
+    await prisma.product.deleteMany();
     const product = await prisma.product.create({
       data: {
         id: 1,
@@ -30,7 +30,6 @@ describe('인증이 필요하지 않은 상품 API 테스트', () => {
   });
 
   afterAll(async () => {
-    await prisma.product.deleteMany();
     await prisma.$disconnect();
   });
 
@@ -79,7 +78,7 @@ describe('인증이 필요하지 않은 상품 API 테스트', () => {
         stock: 10,
       });
     });
-    test('잘못된 파라미터로 요청 > 404코드,조회 상품 없음 반환', async () => {
+    test('잘못된 파라미터로 요청 > 404코드,에러 메세지 반환', async () => {
       const productId = 4;
       const response = await request(app).get(`/products/${productId}`);
       expect(response.status).toBe(404);

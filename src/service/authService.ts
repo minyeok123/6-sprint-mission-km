@@ -42,7 +42,7 @@ export class AuthService {
     const { email, password } = data;
     const user = await this.authRepository.findUnique({ where: { email } });
     if (!user) {
-      throw new HttpError(401, '잘못된 접근입니다.');
+      throw new HttpError(401, '존재하지 않는 이메일 입니다.');
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
