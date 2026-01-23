@@ -35,9 +35,10 @@
   },
   "type": "commonjs",
   "scripts": {
-    "start": "node dist/app.js",
-    "dev": "nodemon --watch src --exec ts-node src/app.ts",
-    "build": "tsc"
+    "start": "node dist/main.js",
+    "dev": "nodemon --watch src --exec ts-node src/main.ts",
+    "build": "tsc",
+    "test": "jest  --coverage"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

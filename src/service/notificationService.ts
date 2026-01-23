@@ -11,7 +11,8 @@ export class NotificationService {
     const { page = 1, limit = 10 } = query;
     const userId = user.id;
 
-    return this.notificationRepository.findMany({ where: { userId: userId },
+    return this.notificationRepository.findMany({
+      where: { userId: userId },
       orderBy: { createdAt: 'desc' },
       skip: (page - 1) * limit,
       take: limit,
@@ -23,7 +24,8 @@ export class NotificationService {
         createdAt: true,
         productId: true,
         articleId: true,
-      },});
+      },
+    });
   }
 
   async getUnreadCount(user: User) {

@@ -35,5 +35,5 @@ export const UserIdParams = s.object({
 });
 export type UserIdParamsType = Infer<typeof UserIdParams>;
 
-export const GetUserQuery = s.intersection([PaginationQuery, OrderQuery]);
+export const GetUserQuery = s.assign(PaginationQuery, OrderQuery);
 export type GetUserQueryType = Infer<typeof GetUserQuery>;

@@ -18,9 +18,8 @@ export class ProductService {
       recent: { createdAt: 'desc' },
       oldest: { createdAt: 'asc' },
     } as const;
-    // const where = search ? { name || description:search} : {}; >> 첫 시도
     const where = search
-      ? { OR: [{ name: { contains: search } }, { description: { contains: search } }] }
+      ? { OR: [{ productName: { contains: search } }, { description: { contains: search } }] }
       : {};
     // 프리즈마 내에서 or 사용 방법 {OR:{[{조건1},{조건2}]}}  >  ai 활용
     //{fieldName:{contains:...}} >> contains는 where이라는 옵션 안에있는 특정 필드등에 적용되는 더 세부적인 옵션
@@ -103,8 +102,8 @@ export class ProductService {
 
     const dataToUpdate = {
       where: { id: productId },
-      data: { 
-        ...productData, 
+      data: {
+        ...productData,
         productTags: tagConnect ? { deleteMany: {}, create: tagConnect } : undefined,
       },
     };
@@ -143,6 +142,7 @@ export class ProductService {
         productName: true,
         description: true,
         price: true,
+        stock: true,
         productTags: { select: { tag: true } },
         createdAt: true,
         _count: { select: { productLikes: true } },

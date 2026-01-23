@@ -21,5 +21,5 @@ export const ProductIdParams = s.object({
 });
 export type ProductIdParamsType = Infer<typeof ProductIdParams>;
 
-export const GetProductsQuery = s.intersection([PaginationQuery, SearchQuery, OrderQuery]);
+export const GetProductsQuery = s.assign(PaginationQuery, s.assign(SearchQuery, OrderQuery));
 export type GetProductsQueryType = Infer<typeof GetProductsQuery>;
