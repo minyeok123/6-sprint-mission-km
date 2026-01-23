@@ -141,6 +141,20 @@ describe('인증이 필요한 상품 API 테스트', () => {
       expect(response.status).toBe(400);
       expect(response.body.message).toBe('전달 사항을 조건에 맞춰 수정해주세요');
     });
+    test('비로그인 요청 > 401코드와 에러 메세지 반환', async () => {
+      const response = await request(app)
+        .post('/products')
+        .set('Cookie', 'access-token=invalid-token')
+        .send({
+          productName: '테스트1',
+          description: '테스트1',
+          price: 999,
+          stock: 10,
+          tag: '테스트',
+        });
+      expect(response.status).toBe(401);
+      expect(response.body.message).toBe('유효하지 않은 토큰입니다.');
+    });
   });
 
   describe('상품 수정 API 테스트', () => {
