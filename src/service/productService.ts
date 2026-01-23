@@ -66,15 +66,24 @@ export class ProductService {
       }
     }
 
-    const dataToSave = {
+    const product = await this.productRepository.create({
       data: {
         ...productData,
         productImages: image,
         productTags: tagConnect ? { create: tagConnect } : undefined,
         user: { connect: { id: user.id } },
       },
-    };
-    const product = await this.productRepository.create(dataToSave);
+      select: {
+        id: true,
+        productName: true,
+        description: true,
+        price: true,
+        stock: true,
+        productTags: { select: { tag: true } },
+        createdAt: true,
+        _count: { select: { productLikes: true } },
+      },
+    });
     return product;
   }
 
@@ -99,15 +108,23 @@ export class ProductService {
         tagConnect = { tag: { connect: { id: newTag.id } } };
       }
     }
-
-    const dataToUpdate = {
+    const patchedProduct = await this.productRepository.update({
       where: { id: productId },
       data: {
         ...productData,
         productTags: tagConnect ? { deleteMany: {}, create: tagConnect } : undefined,
       },
-    };
-    const patchedProduct = await this.productRepository.update(dataToUpdate);
+      select: {
+        id: true,
+        productName: true,
+        description: true,
+        price: true,
+        stock: true,
+        productTags: { select: { tag: true } },
+        createdAt: true,
+        _count: { select: { productLikes: true } },
+      },
+    });
 
     if (productData.price && productData.price !== findProduct.price) {
       const likedUsers = await this.productRepository.findLikes({

@@ -2,6 +2,8 @@ import request from 'supertest';
 import app from '../src/app';
 import { prisma } from '../src/utils/prismaClient';
 
+const agent = request.agent(app);
+
 describe('인증이 필요하지 않은 게시글 API에 대한 통합 테스트', () => {
   beforeAll(async () => {
     await prisma.article.deleteMany();

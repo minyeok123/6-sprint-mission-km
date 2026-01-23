@@ -2,13 +2,12 @@ import * as s from 'superstruct';
 import type { Infer } from 'superstruct';
 import { PaginationQuery, SearchQuery, OrderQuery } from './commonStruct';
 import { NumberFromString } from './commonStruct';
-const TAGS = ['FASHION', 'ELECTRONICS', 'KITCHENWARE'] as const;
 
 export const CreateProduct = s.object({
   productName: s.size(s.string(), 1, 30),
   description: s.string(),
   price: s.min(s.integer(), 0),
-  tag: s.enums(TAGS),
+  tag: s.size(s.string(), 1, 10),
   stock: s.min(s.integer(), 1),
 });
 export type CreateProductType = Infer<typeof CreateProduct>;
