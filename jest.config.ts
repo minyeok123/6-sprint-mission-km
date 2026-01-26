@@ -10,4 +10,4 @@ const config: Config = {
   moduleFileExtensions: ['ts', 'js'],
 };
 
-export default config;
+module.exports = config;

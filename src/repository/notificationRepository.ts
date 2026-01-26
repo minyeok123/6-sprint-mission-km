@@ -11,6 +11,9 @@ export class NotificationRepository {
   async update(options: Prisma.NotificationUpdateArgs) {
     return prisma.notification.update(options);
   }
+  async create(options: Prisma.NotificationCreateArgs) {
+    return prisma.notification.create(options);
+  }
   async findUniqueOrThrow<T extends Prisma.NotificationFindUniqueOrThrowArgs>(
     options: Prisma.SelectSubset<T, Prisma.NotificationFindUniqueOrThrowArgs>,
   ) {

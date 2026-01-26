@@ -10,8 +10,13 @@ import { getIO } from '../socket';
 import { NotificationType } from '@prisma/client';
 import { prisma } from '../utils/prismaClient';
 
+import { NotificationService } from './notificationService';
+
 export class ProductService {
-  constructor(private productRepository: ProductRepository) {}
+  constructor(
+    private productRepository: ProductRepository,
+    private notificationService: NotificationService,
+  ) {}
   async getProduct(query: GetProductsQueryType) {
     const { page = 1, limit = 10, order, search } = query;
     const orderbyOption = {
@@ -112,7 +117,7 @@ export class ProductService {
       where: { id: productId },
       data: {
         ...productData,
-        productTags: tagConnect ? { deleteMany: {}, create: tagConnect } : undefined,
+        productTags: tagConnect ? { create: tagConnect } : undefined,
       },
       select: {
         id: true,
@@ -131,19 +136,15 @@ export class ProductService {
         where: { productId: productId },
         select: { userId: true },
       });
-      const io = getIO();
-      for (const liker of likedUsers) {
-        if (liker.userId !== user.id) {
-          const notification = await prisma.notification.create({
-            data: {
-              userId: liker.userId,
-              type: NotificationType.PRICE_CHANGE,
-              message: `관심 상품 '${patchedProduct.productName}'의 가격이 변동되었습니다.`,
-              productId: productId,
-            },
-          });
-          io.to(String(liker.userId)).emit('notification', { message: notification.message });
-        }
+      const userIdsToNotify = likedUsers
+        .map((liker) => liker.userId)
+        .filter((likerId) => likerId !== user.id);
+
+      if (userIdsToNotify.length > 0) {
+        await this.notificationService.notifyPriceChange(userIdsToNotify, {
+          id: patchedProduct.id,
+          productName: patchedProduct.productName,
+        });
       }
     }
 
