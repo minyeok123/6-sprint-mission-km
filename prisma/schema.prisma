@@ -14,143 +14,262 @@ datasource db {
 }
 
 model User {
-  id             Int             @id @default(autoincrement())
-  email          String          @unique
-  name           String
-  nickname       String          @unique
-  password       String
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  profileImage   ProfileImage?
-  userPreference UserPreference?
-  comment        Comment[]
-  order          Order[]
-  products       Product[]
-  articles       Article[]
-  like           Like[]
+  id                    Int                    @id @default(autoincrement())
+  email                 String                 @unique
+  name                  String
+  nickname              String                 @unique
+  password              String
+  createdAt             DateTime               @default(now()) @map("created_at")
+  updatedAt             DateTime               @updatedAt @map("updated_at")
+  profileImage          ProfileImage?
+  userPreference        UserPreference?
+  order                 Order[]
+  products              Product[]
+  articles              Article[]
+  articleLikes          ArticleLike[]
+  productLikes          ProductLike[]
+  articleComment        ArticleComment[]
+  productComment        ProductComment[]
+  productInquiries      ProductInquiry[]
+  productInquiryAnswers ProductInquiryAnswer[]
+  notifications         Notification[]
+
+  @@map("users")
 }
 
 model UserPreference {
   id            Int      @id @default(autoincrement())
-  receivedEmail Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  receivedEmail Boolean  @default(false) @map("received_email")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId        Int      @unique
+  userId        Int      @unique @map("user_id")
+
+  @@map("user_preferences")
 }
 
 model ProfileImage {
   id        Int      @id @default(autoincrement())
   url       String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int      @unique
+  userId    Int      @unique @map("user_id")
+
+  @@map("profile_images")
 }
 
 model Order {
   id         Int         @id @default(autoincrement())
-  status     status      @default(PENDING)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  status     OrderStatus @default(PENDING)
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     Int
   orderItems OrderItem[]
+
+  @@map("orders")
 }
 
 model OrderItem {
   id        Int      @id @default(autoincrement())
   quantity  Int
-  unitPrice Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  unitPrice Float    @map("unit_price")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
   order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId   Int
+  orderId   Int      @map("order_id")
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId Int
+  productId Int      @map("product_id")
+
+  @@map("order_items")
 }
 
 model Product {
-  id            Int            @id @default(autoincrement())
-  productName   String
-  description   String
-  price         Float
-  tag           tag
-  stock         Int
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId        Int
-  comment       Comment[]
-  orderItem     OrderItem[]
-  productImages ProductImage[]
-  like          Like[]
+  id               Int              @id @default(autoincrement())
+  productName      String           @map("product_name")
+  description      String
+  price            Float
+  stock            Int
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId           Int              @map("user_id")
+  orderItem        OrderItem[]
+  productImages    ProductImage[]
+  productLikes     ProductLike[]
+  productComments  ProductComment[]
+  productTags      ProductWithTag[]
+  productInquiries ProductInquiry[]
+  notifications    Notification[]
+
+  @@map("products")
+}
+
+model Tag {
+  id          Int              @id @default(autoincrement())
+  tag         String
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+  productTags ProductWithTag[]
+
+  @@map("tags")
+}
+
+model ProductWithTag {
+  id        Int      @id @default(autoincrement())
+  productId Int      @map("product_id")
+  tagId     Int      @map("tag_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, tagId])
+  @@map("product_with_tags")
 }
 
 model ProductImage {
   id        Int      @id @default(autoincrement())
   url       String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId Int
+  productId Int      @map("product_id")
+
+  @@map("product_images")
+}
+
+model ProductInquiry {
+  id                    Int                   @id @default(autoincrement())
+  userId                Int                   @map("user_id")
+  productId             Int                   @map("product_id")
+  content               String
+  createdAt             DateTime              @default(now()) @map("created_at")
+  updatedAt             DateTime              @updatedAt @map("updated_at")
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product               Product               @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productInquiryAnswers ProductInquiryAnswer?
+
+  @@map("product_inquiries")
+}
+
+model ProductInquiryAnswer {
+  id               Int            @id @default(autoincrement())
+  userId           Int            @map("user_id")
+  productInquiryId Int            @unique @map("product_inquiry_id")
+  content          String
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productInquiry   ProductInquiry @relation(fields: [productInquiryId], references: [id], onDelete: Cascade)
+
+  @@map("product_inquiry_answers")
 }
 
 model Article {
-  id            Int            @id @default(autoincrement())
-  title         String
-  content       String
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId        Int
-  comment       Comment[]
-  articleImages ArticleImage[]
-  like          Like[]
+  id              Int              @id @default(autoincrement())
+  title           String
+  content         String
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          Int              @map("user_id")
+  articleImages   ArticleImage[]
+  articleLikes    ArticleLike[]
+  articleComments ArticleComment[]
+  notifications   Notification[]
+
+  @@map("articles")
 }
 
 model ArticleImage {
   id        Int      @id @default(autoincrement())
   url       String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
   article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  articleId Int
+  articleId Int      @map("article_id")
+
+  @@map("article_images")
 }
 
-model Like {
+model ArticleLike {
   id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
+  userId    Int      @map("user_id")
+  articleId Int      @map("article_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
-  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId Int?
-  article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  articleId Int?
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, productId, articleId])
+  @@unique([userId, articleId])
+  @@map("article_likes")
 }
 
-model Comment {
+model ProductLike {
   id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  productId Int      @map("product_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@map("product_likes")
+}
+
+model ArticleComment {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  articleId Int      @map("article_id")
   content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId Int?
-  article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  articleId Int?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
+
+  @@map("article_comments")
 }
 
-enum tag {
-  FASHION
-  ELECTRONICS
-  KITCHENWARE
+model ProductComment {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  productId Int      @map("product_id")
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("product_comments")
 }
 
-enum status {
+enum OrderStatus {
   PENDING
   COMPLETE
+}
+
+model Notification {
+  id        Int              @id @default(autoincrement())
+  userId    Int              @map("user_id")
+  message   String
+  isRead    Boolean          @default(false) @map("is_read")
+  productId Int?             @map("product_id")
+  articleId Int?             @map("article_id")
+  type      NotificationType
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  article Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  PRICE_CHANGE
+  NEW_COMMENT
 }

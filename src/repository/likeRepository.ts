@@ -2,13 +2,23 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '../utils/prismaClient';
 
 export class LikeRepository {
-  async create(options: Prisma.LikeCreateArgs) {
-    return prisma.like.create(options);
+  async createProductLike(options: Prisma.ProductLikeCreateArgs) {
+    return prisma.productLike.create(options);
   }
-  async delete(options: Prisma.LikeDeleteArgs) {
-    return prisma.like.delete(options);
+  async deleteProductLike(options: Prisma.ProductLikeDeleteArgs) {
+    return prisma.productLike.delete(options);
   }
-  async findFirst(options: Prisma.LikeFindFirstArgs) {
-    return prisma.like.findFirst(options);
+  async findFirstProductLike(options: Prisma.ProductLikeFindFirstArgs) {
+    return prisma.productLike.findFirst(options);
+  }
+
+  async createArticleLike(options: Prisma.ArticleLikeCreateArgs) {
+    return prisma.articleLike.create(options);
+  }
+  async deleteArticleLike(options: Prisma.ArticleLikeDeleteArgs) {
+    return prisma.articleLike.delete(options);
+  }
+  async findFirstArticleLike(options: Prisma.ArticleLikeFindFirstArgs) {
+    return prisma.articleLike.findFirst(options);
   }
 }

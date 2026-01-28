@@ -22,4 +22,13 @@ export class ProductRepository {
   async delete(options: Prisma.ProductDeleteArgs) {
     return prisma.product.delete(options);
   }
+  async findFirstTag(options: Prisma.TagFindFirstArgs) {
+    return prisma.tag.findFirst(options);
+  }
+  async createTag(options: Prisma.TagCreateArgs) {
+    return prisma.tag.create(options);
+  }
+  async findLikes(options: Prisma.ProductLikeFindManyArgs) {
+    return prisma.productLike.findMany(options);
+  }
 }

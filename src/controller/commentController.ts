@@ -33,24 +33,45 @@ export class commentController {
     res.status(201).send(articleComment);
   };
 
-  static patchComment = async (req: Request, res: Response) => {
+  static patchProductComment = async (req: Request, res: Response) => {
     const { commentId } = (req as ValidatedParamsRequest<CommentIdParamsType>).validatedParams;
     const data = req.body as PatchCommentType;
     const user = req.user as User;
-    const patchedComment = await commentService.patchComment(commentId, data, user);
+    const patchedComment = await commentService.patchProductComment(commentId, data, user);
     res.status(200).send(patchedComment);
   };
 
-  static getAllComment = async (req: Request, res: Response) => {
+  static patchArticleComment = async (req: Request, res: Response) => {
+    const { commentId } = (req as ValidatedParamsRequest<CommentIdParamsType>).validatedParams;
+    const data = req.body as PatchCommentType;
+    const user = req.user as User;
+    const patchedComment = await commentService.patchArticleComment(commentId, data, user);
+    res.status(200).send(patchedComment);
+  };
+
+  static getProductComments = async (req: Request, res: Response) => {
     const query = req.query as GetCommentQueryType;
-    const { comments, nextCursor } = await commentService.getAllComment(query);
+    const { comments, nextCursor } = await commentService.getProductComments(query);
     res.status(200).send({ comments, nextCursor });
   };
 
-  static deleteComment = async (req: Request, res: Response) => {
+  static getArticleComments = async (req: Request, res: Response) => {
+    const query = req.query as GetCommentQueryType;
+    const { comments, nextCursor } = await commentService.getArticleComments(query);
+    res.status(200).send({ comments, nextCursor });
+  };
+
+  static deleteProductComment = async (req: Request, res: Response) => {
     const { commentId } = (req as ValidatedParamsRequest<CommentIdParamsType>).validatedParams;
     const user = req.user as User;
-    await commentService.deleteComment(commentId, user);
+    await commentService.deleteProductComment(commentId, user);
+    res.sendStatus(204);
+  };
+
+  static deleteArticleComment = async (req: Request, res: Response) => {
+    const { commentId } = (req as ValidatedParamsRequest<CommentIdParamsType>).validatedParams;
+    const user = req.user as User;
+    await commentService.deleteArticleComment(commentId, user);
     res.sendStatus(204);
   };
 }

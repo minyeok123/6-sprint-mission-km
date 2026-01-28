@@ -11,20 +11,36 @@ import { ArticleIdParams } from '../structs/articleStruct';
 import { CreateArticleComment } from '../structs/commentStruct';
 const commentRouter = express.Router();
 
-//댓글 수정 및 삭제
+// Product Comment Update/Delete
 commentRouter
-  .route('/:commentId')
+  .route('/product-comments/:commentId')
   .patch(
     authenticate,
     textParser,
     validate(CommentIdParams, 'params'),
     validate(PatchComment),
-    tryCatchHandler(commentController.patchComment),
+    tryCatchHandler(commentController.patchProductComment),
   )
   .delete(
     authenticate,
     validate(CommentIdParams, 'params'),
-    tryCatchHandler(commentController.deleteComment),
+    tryCatchHandler(commentController.deleteProductComment),
+  );
+
+// Article Comment Update/Delete
+commentRouter
+  .route('/article-comments/:commentId')
+  .patch(
+    authenticate,
+    textParser,
+    validate(CommentIdParams, 'params'),
+    validate(PatchComment),
+    tryCatchHandler(commentController.patchArticleComment),
+  )
+  .delete(
+    authenticate,
+    validate(CommentIdParams, 'params'),
+    tryCatchHandler(commentController.deleteArticleComment),
   );
 
 //상품 댓글 생성
@@ -37,6 +53,7 @@ commentRouter
     validate(CreateProductComment),
     tryCatchHandler(commentController.createProductComment),
   );
+
 //아티클 댓글 생성
 commentRouter
   .route('/:articleId/article-comments')
@@ -48,10 +65,16 @@ commentRouter
     tryCatchHandler(commentController.createArticleComment),
   );
 
-//모든 댓글 조회
+//상품 댓글 전체 조회 
 commentRouter
-  .route('/')
-  .get(validate(GetCommentQuery, 'query'), tryCatchHandler(commentController.getAllComment));
+  .route('/product-comments')
+  .get(validate(GetCommentQuery, 'query'), tryCatchHandler(commentController.getProductComments));
+
+//아티클 댓글 전체 조회
+commentRouter
+  .route('/article-comments')
+  .get(validate(GetCommentQuery, 'query'), tryCatchHandler(commentController.getArticleComments));
+
 
 export default commentRouter;
 // 프리즈마 문서만 참고해서 커서 옵션을 사용했을 때 시도 >> 실패

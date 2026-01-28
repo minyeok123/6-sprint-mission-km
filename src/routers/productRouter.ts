@@ -49,7 +49,7 @@ productRouter
 //좋아요 및 게시 상품 조회
 productRouter
   .get(
-    '/users/:userId/products',
+    '/users/:userId/created-products',
     authenticate,
     validate(UserIdParams, 'params'),
     tryCatchHandler(ProductController.getCreatedProduct),
