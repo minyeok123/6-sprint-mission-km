@@ -39,19 +39,22 @@ export class CommentService {
       select: { id: true, content: true, createdAt: true, articleId: true, userId: true },
     };
     const comment = await this.commentRepository.createArticleComment(dataToSave);
-    const article = await prisma.article.findUnique({ where: { id: articleId }, select: { userId: true, title: true } });
+    const article = await prisma.article.findUnique({
+      where: { id: articleId },
+      select: { userId: true, title: true },
+    });
     if (article && article.userId !== user.id) {
-        const notification = await prisma.notification.create({
-            data: {
-                userId: article.userId,
-                type: NotificationType.NEW_COMMENT,
-                message: `내 게시글 '${article.title}'에 새로운 댓글이 달렸습니다.`,
-                articleId: articleId,
-            }
-        });
-        
-        const io = getIO();
-        io.to(String(article.userId)).emit('notification', { message: notification.message });
+      const notification = await prisma.notification.create({
+        data: {
+          userId: article.userId,
+          type: NotificationType.NEW_COMMENT,
+          message: `내 게시글 '${article.title}'에 새로운 댓글이 달렸습니다.`,
+          articleId: articleId,
+        },
+      });
+
+      const io = getIO();
+      io.to(String(article.userId)).emit('notification', { message: notification.message });
     }
 
     return comment;
@@ -143,6 +146,7 @@ export class CommentService {
         createdAt: true,
         productId: true,
         userId: true,
+        user: { select: { id: true, nickname: true } },
       },
     };
     const comments = await this.commentRepository.findManyProductComment(findManyOptions);
@@ -167,6 +171,7 @@ export class CommentService {
         createdAt: true,
         articleId: true,
         userId: true,
+        user: { select: { id: true, nickname: true } },
       },
     };
     const comments = await this.commentRepository.findManyArticleComment(findManyOptions);
