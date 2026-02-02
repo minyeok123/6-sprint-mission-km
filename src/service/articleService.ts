@@ -47,15 +47,20 @@ export class ArticleService {
         })),
       };
     }
-    const dataToSave: Prisma.ArticleCreateArgs = {
-      data: {
-        title: title,
-        content: content,
-        user: { connect: { id: userId } },
-        articleImages: image,
-      },
+    const article = await this.articleRepository.create({
+      title,
+      content,
+      user: { connect: { id: userId } },
+      articleImages: image,
+    });
+
+    return {
+      ...article,
+      articleImages: article.articleImages.map((img) => ({
+        id: img.id,
+        url: getS3Url(img.url),
+      })),
     };
-    return this.articleRepository.create(dataToSave);
   }
 
   async getArticleDetail(id: number) {

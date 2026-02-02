@@ -5,8 +5,17 @@ export class ArticleRepository {
   async findMany(options: Prisma.ArticleFindManyArgs) {
     return prisma.article.findMany(options);
   }
-  async create(options: Prisma.ArticleCreateArgs) {
-    return prisma.article.create(options);
+  async create(data: Prisma.ArticleCreateInput) {
+    return prisma.article.create({
+      data,
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        updatedAt: true,
+        articleImages: { select: { id: true, url: true } },
+      },
+    });
   }
   async findUniqueOrThrow<T extends Prisma.ArticleFindUniqueOrThrowArgs>(
     options: Prisma.SelectSubset<T, Prisma.ArticleFindUniqueOrThrowArgs>,

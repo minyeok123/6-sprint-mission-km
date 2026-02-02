@@ -13,8 +13,21 @@ export class ProductRepository {
   async findUnique(options: Prisma.ProductFindUniqueArgs) {
     return prisma.product.findUnique(options);
   }
-  async create(options: Prisma.ProductCreateArgs) {
-    return prisma.product.create(options);
+  async create(data: Prisma.ProductCreateInput) {
+    return prisma.product.create({
+      data,
+      select: {
+        id: true,
+        productName: true,
+        description: true,
+        price: true,
+        stock: true,
+        productTags: { select: { tag: true } },
+        createdAt: true,
+        productImages: { select: { id: true, url: true } },
+        _count: { select: { productLikes: true } },
+      },
+    });
   }
   async update(id: number, data: Prisma.ProductUpdateInput) {
     return prisma.product.update({

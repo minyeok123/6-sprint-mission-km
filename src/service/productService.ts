@@ -73,24 +73,19 @@ export class ProductService {
     }
 
     const product = await this.productRepository.create({
-      data: {
-        ...productData,
-        productImages: image,
-        productTags: tagConnect ? { create: tagConnect } : undefined,
-        user: { connect: { id: user.id } },
-      },
-      select: {
-        id: true,
-        productName: true,
-        description: true,
-        price: true,
-        stock: true,
-        productTags: { select: { tag: true } },
-        createdAt: true,
-        _count: { select: { productLikes: true } },
-      },
+      ...productData,
+      productImages: image,
+      productTags: tagConnect ? { create: tagConnect } : undefined,
+      user: { connect: { id: user.id } },
     });
-    return product;
+
+    return {
+      ...product,
+      productImages: product.productImages.map((img) => ({
+        id: img.id,
+        url: getS3Url(img.url),
+      })),
+    };
   }
 
   async patchProduct(id: number, data: PatchProductType, user: User) {
