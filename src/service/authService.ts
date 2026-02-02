@@ -53,7 +53,7 @@ export class AuthService {
 
   async login(data: LoginUserType) {
     const { email, password } = data;
-    const user = await this.authRepository.findUnique({ where: { email } });
+    const user = await this.authRepository.findByEmail(email);
     if (!user) {
       throw new HttpError(401, '존재하지 않는 이메일 입니다.');
     }
@@ -72,7 +72,7 @@ export class AuthService {
       throw new HttpError(401, '잘못된 접근입니다.');
     }
     const { userId } = verifyRefreshToken(refreshToken); //클라이언트에서 넘어온 토큰이 우리 서버에서 내려준 토큰과 일치하는지 검증
-    const user = await this.authRepository.findUnique({ where: { id: userId } });
+    const user = await this.authRepository.findUserById(userId);
     if (!user) {
       throw new HttpError(401, '유효하지않은 이메일 입니다.');
     }
@@ -83,24 +83,7 @@ export class AuthService {
 
   async userInfo(id: number, user: User) {
     const userId = id;
-    const getInfoOption = {
-      where: { id: userId },
-      select: {
-        id: true,
-        name: true,
-        nickname: true,
-        email: true,
-        createdAt: true,
-        profileImage: {
-          select: {
-            url: true,
-          },
-        },
-      },
-    };
-    const userInfo = (await this.authRepository.findUnique(
-      getInfoOption,
-    )) as unknown as UserInfoType | null;
+    const userInfo = await this.authRepository.findUserById(userId);
     if (!userInfo) {
       throw new HttpError(404, '회원 정보를 찾을수 없습니다.');
     }
@@ -131,32 +114,12 @@ export class AuthService {
       };
     }
 
-    const updateOption: Prisma.UserUpdateArgs = {
-      where: { id: id },
-      data: {
-        ...userFields,
-        userPreference: { update: { receivedEmail } },
-        profileImage: imageUpdate,
-      },
-      select: {
-        id: true,
-        name: true,
-        nickname: true,
-        email: true,
-        createdAt: true,
-        profileImage: {
-          select: {
-            url: true,
-          },
-        },
-      },
-    };
-    const updatedUser = (await this.authRepository.update(updateOption)) as unknown as UserInfoType;
-    /* 
-    레포지토리가 반환하는 타입이 Prisma의 기본 User 타입(프로필 이미지가 없는 상태)으로 추론되는데,
-    실제로는 select 옵션을 통해 profileImage를 포함해서 가져오고 있으므로
-    타입 어설션(as unknown as UserInfoType)을 사용하여 올바른 타입으로 지정합니다.
-    */
+    const updatedUser = await this.authRepository.update(id, {
+      ...userFields,
+      userPreference: { update: { receivedEmail } },
+      profileImage: imageUpdate,
+    });
+
     if (updatedUser.profileImage) {
       updatedUser.profileImage.url = getS3Url(updatedUser.profileImage.url);
     }
@@ -179,14 +142,7 @@ export class AuthService {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    const updatePasswordOption = {
-      where: { id: userId },
-      data: {
-        password: hashedPassword,
-      },
-    };
-
-    await this.authRepository.update(updatePasswordOption);
+    await this.authRepository.updatePassword(userId, hashedPassword);
   }
 
   async deleteAccount(id: number, user: User) {

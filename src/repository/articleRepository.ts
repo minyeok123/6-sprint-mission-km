@@ -13,10 +13,30 @@ export class ArticleRepository {
   ) {
     return prisma.article.findUniqueOrThrow(options);
   }
-  async update(option: Prisma.ArticleUpdateArgs) {
-    return prisma.article.update(option);
+  async update(id: number, data: Prisma.ArticleUpdateInput) {
+    return prisma.article.update({
+      where: { id },
+      data,
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        updatedAt: true,
+        articleImages: { select: { id: true, url: true } },
+      },
+    });
   }
   async delete(option: Prisma.ArticleDeleteArgs) {
     return prisma.article.delete(option);
+  }
+  async deleteImages(ids: number[]) {
+    return prisma.articleImage.deleteMany({
+      where: { id: { in: ids } },
+    });
+  }
+  async createImages(data: Prisma.ArticleImageCreateManyInput[]) {
+    return prisma.articleImage.createMany({
+      data,
+    });
   }
 }

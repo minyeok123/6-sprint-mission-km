@@ -9,7 +9,13 @@ export const CreateArticle = s.object({
 });
 export type CreateArticleType = Infer<typeof CreateArticle>;
 
-export const PatchArticle = s.partial(CreateArticle);
+export const PatchArticle = s.assign(
+  s.partial(CreateArticle),
+  s.object({
+    newImages: s.optional(s.array(s.string())),
+    deleteImageIds: s.optional(s.array(s.number())),
+  }),
+);
 export type PatchArticleType = Infer<typeof PatchArticle>;
 
 export const ArticleIdParams = s.object({

@@ -67,7 +67,7 @@ export class ArticleService {
         title: true,
         content: true,
         createdAt: true,
-        articleImages: { select: { url: true } },
+        articleImages: { select: { id: true, url: true } },
         _count: { select: { articleLikes: true } },
       },
     } as const;
@@ -76,21 +76,15 @@ export class ArticleService {
 
     return {
       ...article,
-      articleImages: article.articleImages.map((img) => getS3Url(img.url)),
+      articleImages: article.articleImages.map((img) => ({ id: img.id, url: getS3Url(img.url) })),
       isLiked: article._count.articleLikes > 0,
     };
   }
 
   async patchArticle(id: number, body: PatchArticleType, user: User) {
     const articleId = id;
-    const { content, title } = body;
-    const dataToUpdate = {
-      where: { id: articleId },
-      data: {
-        title,
-        content,
-      },
-    };
+    const { content, title, newImages, deleteImageIds } = body;
+
     const articleToUpdate = await this.articleRepository.findUniqueOrThrow({
       where: { id: articleId },
       select: { userId: true },
@@ -100,7 +94,26 @@ export class ArticleService {
       throw new HttpError(403, '게시글을 수정할 권한이 없습니다.');
     }
 
-    return this.articleRepository.update(dataToUpdate);
+    if (deleteImageIds && deleteImageIds.length > 0) {
+      await this.articleRepository.deleteImages(deleteImageIds);
+    }
+
+    if (newImages && newImages.length > 0) {
+      await this.articleRepository.createImages(newImages.map((url) => ({ articleId, url })));
+    }
+
+    const updatedArticle = await this.articleRepository.update(articleId, {
+      title,
+      content,
+    });
+
+    return {
+      ...updatedArticle,
+      articleImages: updatedArticle.articleImages.map((img) => ({
+        id: img.id,
+        url: getS3Url(img.url),
+      })),
+    };
   }
 
   async deleteArticle(id: number, user: User) {

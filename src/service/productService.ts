@@ -95,13 +95,21 @@ export class ProductService {
 
   async patchProduct(id: number, data: PatchProductType, user: User) {
     const productId = id;
-    const { tag, ...productData } = data;
+    const { tag, newImages, deleteImageIds, ...productData } = data;
     const findProduct = await this.productRepository.findUniqueOrThrow({
       where: { id: productId },
       select: { userId: true, price: true },
     });
     if (findProduct.userId !== user.id) {
       throw new HttpError(403, '상품을 수정할 권한이 없습니다.');
+    }
+
+    if (deleteImageIds && deleteImageIds.length > 0) {
+      await this.productRepository.deleteImages(deleteImageIds);
+    }
+
+    if (newImages && newImages.length > 0) {
+      await this.productRepository.createImages(newImages.map((url) => ({ productId, url })));
     }
 
     let tagConnect;
@@ -114,22 +122,9 @@ export class ProductService {
         tagConnect = { tag: { connect: { id: newTag.id } } };
       }
     }
-    const patchedProduct = await this.productRepository.update({
-      where: { id: productId },
-      data: {
-        ...productData,
-        productTags: tagConnect ? { create: tagConnect } : undefined,
-      },
-      select: {
-        id: true,
-        productName: true,
-        description: true,
-        price: true,
-        stock: true,
-        productTags: { select: { tag: true } },
-        createdAt: true,
-        _count: { select: { productLikes: true } },
-      },
+    const patchedProduct = await this.productRepository.update(productId, {
+      ...productData,
+      productTags: tagConnect ? { create: tagConnect } : undefined,
     });
 
     if (productData.price && productData.price !== findProduct.price) {
@@ -149,7 +144,13 @@ export class ProductService {
       }
     }
 
-    return patchedProduct;
+    return {
+      ...patchedProduct,
+      productImages: patchedProduct.productImages.map((img) => ({
+        id: img.id,
+        url: getS3Url(img.url),
+      })),
+    };
   }
 
   async getProductDetail(id: number) {
@@ -164,7 +165,7 @@ export class ProductService {
         stock: true,
         productTags: { select: { tag: true } },
         createdAt: true,
-        productImages: { select: { url: true } },
+        productImages: { select: { id: true, url: true } },
         _count: { select: { productLikes: true } },
       },
     };
@@ -172,7 +173,7 @@ export class ProductService {
 
     return {
       ...product,
-      productImages: product.productImages.map((img) => getS3Url(img.url)),
+      productImages: product.productImages.map((img) => ({ id: img.id, url: getS3Url(img.url) })),
       isLiked: product._count.productLikes > 0,
     };
   }
