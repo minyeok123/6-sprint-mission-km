@@ -4,7 +4,7 @@ import { validate } from '../middleware/validate';
 import { tryCatchHandler } from '../middleware/errorhandler';
 import { commentController } from '../controller/commentController';
 import { authenticate } from '../middleware/authenticate';
-import { textParser } from '../middleware/formdataParser';
+
 import { ProductIdParams } from '../structs/productStruct';
 import { CreateProductComment } from '../structs/commentStruct';
 import { ArticleIdParams } from '../structs/articleStruct';
@@ -16,7 +16,6 @@ commentRouter
   .route('/product-comments/:commentId')
   .patch(
     authenticate,
-    textParser,
     validate(CommentIdParams, 'params'),
     validate(PatchComment),
     tryCatchHandler(commentController.patchProductComment),
@@ -32,7 +31,6 @@ commentRouter
   .route('/article-comments/:commentId')
   .patch(
     authenticate,
-    textParser,
     validate(CommentIdParams, 'params'),
     validate(PatchComment),
     tryCatchHandler(commentController.patchArticleComment),
@@ -48,7 +46,6 @@ commentRouter
   .route('/:productId/product-comments')
   .post(
     authenticate,
-    textParser,
     validate(ProductIdParams, 'params'),
     validate(CreateProductComment),
     tryCatchHandler(commentController.createProductComment),
@@ -59,13 +56,12 @@ commentRouter
   .route('/:articleId/article-comments')
   .post(
     authenticate,
-    textParser,
     validate(ArticleIdParams, 'params'),
     validate(CreateArticleComment),
     tryCatchHandler(commentController.createArticleComment),
   );
 
-//상품 댓글 전체 조회 
+//상품 댓글 전체 조회
 commentRouter
   .route('/product-comments')
   .get(validate(GetCommentQuery, 'query'), tryCatchHandler(commentController.getProductComments));
@@ -74,7 +70,6 @@ commentRouter
 commentRouter
   .route('/article-comments')
   .get(validate(GetCommentQuery, 'query'), tryCatchHandler(commentController.getArticleComments));
-
 
 export default commentRouter;
 // 프리즈마 문서만 참고해서 커서 옵션을 사용했을 때 시도 >> 실패

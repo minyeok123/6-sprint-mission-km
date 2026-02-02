@@ -19,5 +19,3 @@ export function UploadImage(): multer.Multer {
     fileFilter,
   });
 }
-
-export const textParser = multer().fields([]);
