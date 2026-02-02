@@ -20,7 +20,7 @@ export const putImage = async (
   const command = new PutObjectCommand({
     Bucket: AWS_BUKET_NAME,
     Key: key,
-    Body: body as any, // SDK stream/buffer 호환
+    Body: body, // SDK stream/buffer 호환
     ContentType: contentType,
   });
   return s3.send(command);

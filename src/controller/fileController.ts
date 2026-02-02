@@ -14,7 +14,7 @@ export class FileController {
     }
 
     // 폴더명 결정 (쿼리 파라미터는 필수이므로 항상 값이 존재함)
-    const folder = req.query.folder as string;
+    const folder = req.query.folder;
 
     // 프로필 이미지는 1장만 허용
     if (folder === 'profiles' && files.length > 1) {

@@ -34,14 +34,15 @@ export class ArticleService {
     return this.articleRepository.findMany(findManyOptions);
   }
 
-  async createArticle(data: CreateArticleType, user: User, file?: Express.Multer.File[]) {
-    const { title, content } = data;
+  async createArticle(data: CreateArticleType, user: User) {
+    const { title, content, imageUrls } = data;
     const userId = user.id;
+
     let image;
-    if (Array.isArray(file) && file.length > 0) {
+    if (imageUrls && imageUrls.length > 0) {
       image = {
-        create: file.map((file) => ({
-          url: `/files/article-image/${file.filename}`,
+        create: imageUrls.map((url) => ({
+          url,
         })),
       };
     }

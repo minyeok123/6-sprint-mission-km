@@ -13,13 +13,14 @@ import { generateTokens, verifyRefreshToken } from '../utils/token';
 export class AuthService {
   constructor(private authRepository: AuthRepository) {}
 
-  async register(data: CreateUserType, file?: Express.Multer.File) {
-    const { password, receivedEmail, ...userFields } = data;
+  async register(data: CreateUserType) {
+    const { password, receivedEmail, profileImage, ...userFields } = data;
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+
     let image;
-    if (file) {
-      image = { create: { url: `/files/user-profiles/${file.filename}` } };
+    if (profileImage) {
+      image = { create: { url: profileImage } };
     }
     const dataToSave: Prisma.UserCreateArgs = {
       data: {
@@ -100,12 +101,24 @@ export class AuthService {
     if (id !== user.id) {
       throw new HttpError(403, '정보를 수정할 권한이 없습니다.');
     }
-    const { receivedEmail, ...userFields } = data;
-    const updateOption = {
+    const { receivedEmail, profileImage, ...userFields } = data;
+
+    let imageUpdate;
+    if (profileImage) {
+      imageUpdate = {
+        upsert: {
+          create: { url: profileImage },
+          update: { url: profileImage },
+        },
+      };
+    }
+
+    const updateOption: Prisma.UserUpdateArgs = {
       where: { id: id },
       data: {
         ...userFields,
         userPreference: { update: { receivedEmail } },
+        profileImage: imageUpdate,
       },
       select: {
         id: true,

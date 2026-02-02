@@ -28,9 +28,8 @@ export class ProductController {
   //상품 생성
   static createProduct = async (req: Request, res: Response) => {
     const data = req.body as CreateProductType;
-    const productImage = req.files as Express.Multer.File[];
     const user = req.user as User;
-    const product = await productService.createProduct(data, user, productImage);
+    const product = await productService.createProduct(data, user);
     res.status(201).send(product);
   };
 

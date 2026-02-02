@@ -49,13 +49,13 @@ export class ProductService {
     return product;
   }
 
-  async createProduct(data: CreateProductType, user: User, files?: Express.Multer.File[]) {
-    const { tag, ...productData } = data;
+  async createProduct(data: CreateProductType, user: User) {
+    const { tag, imageUrls, ...productData } = data;
     let image;
-    if (Array.isArray(files) && files.length > 0) {
+    if (imageUrls && imageUrls.length > 0) {
       image = {
-        create: files.map((file) => ({
-          url: `/files/product-image/${file.filename}`,
+        create: imageUrls.map((url) => ({
+          url,
         })),
       };
     }

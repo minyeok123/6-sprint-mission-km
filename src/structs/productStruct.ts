@@ -9,6 +9,7 @@ export const CreateProduct = s.object({
   price: s.min(s.integer(), 0),
   tag: s.size(s.string(), 1, 10),
   stock: s.min(s.integer(), 1),
+  imageUrls: s.optional(s.array(s.string())), // 이미지 URL 목록
 });
 export type CreateProductType = Infer<typeof CreateProduct>;
 

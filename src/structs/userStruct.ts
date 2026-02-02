@@ -12,6 +12,7 @@ export const CreateUser = s.object({
   nickname: s.size(s.string(), 2, 10),
   name: s.size(s.string(), 1, 10),
   receivedEmail: s.optional(s.boolean()),
+  profileImage: s.optional(s.string()),
 });
 export type CreateUserType = Infer<typeof CreateUser>;
 

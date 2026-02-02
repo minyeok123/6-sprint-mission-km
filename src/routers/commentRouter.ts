@@ -4,7 +4,6 @@ import { validate } from '../middleware/validate';
 import { tryCatchHandler } from '../middleware/errorhandler';
 import { commentController } from '../controller/commentController';
 import { authenticate } from '../middleware/authenticate';
-
 import { ProductIdParams } from '../structs/productStruct';
 import { CreateProductComment } from '../structs/commentStruct';
 import { ArticleIdParams } from '../structs/articleStruct';
