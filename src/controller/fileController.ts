@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { putImage } from '../utils/s3Handler';
+import { putImage, getS3Url } from '../utils/s3Handler';
 import { HttpError } from '../utils/errors';
 import path from 'path';
 import crypto from 'crypto';
@@ -28,12 +28,18 @@ export class FileController {
       const key = `${folder}/${unique}${ext}`;
 
       await putImage(key, file.buffer, file.mimetype);
-      return key; // 업로드된 키 반환
+      const url = getS3Url(key);
+      /* 
+      클라이언트에서 업로드된 파일에 접근 해야하기 때문에 Key와 URL 모두 반환
+      key -> DB에 저장할 상대경로
+      url -> 클라이언트에서 파일에 접근할 때 사용할 절대경로
+      */
+      return { key, url };
     });
 
-    const keys = await Promise.all(uploadPromises);
+    const results = await Promise.all(uploadPromises);
 
-    // 업로드된 파일 경로 목록 반환
-    res.status(201).send({ urls: keys });
+    // 업로드된 파일 정보 목록 반환
+    res.status(201).send(results);
   };
 }
