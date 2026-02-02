@@ -9,6 +9,18 @@ import {
 } from '../structs/userStruct';
 import bcrypt from 'bcrypt';
 import { generateTokens, verifyRefreshToken } from '../utils/token';
+import { getS3Url } from '../utils/s3Handler';
+
+interface UserInfoType {
+  id: number;
+  name: string;
+  nickname: string;
+  email: string;
+  createdAt: Date;
+  profileImage: {
+    url: string;
+  } | null;
+}
 
 export class AuthService {
   constructor(private authRepository: AuthRepository) {}
@@ -86,12 +98,18 @@ export class AuthService {
         },
       },
     };
-    const userInfo = await this.authRepository.findUnique(getInfoOption);
+    const userInfo = (await this.authRepository.findUnique(
+      getInfoOption,
+    )) as unknown as UserInfoType | null;
     if (!userInfo) {
       throw new HttpError(404, '회원 정보를 찾을수 없습니다.');
     }
     if (userInfo.id !== user.id) {
       throw new HttpError(403, '자신의 정보만 조회할 수 있습니다.');
+    }
+
+    if (userInfo.profileImage) {
+      userInfo.profileImage.url = getS3Url(userInfo.profileImage.url);
     }
 
     return userInfo;
@@ -133,7 +151,16 @@ export class AuthService {
         },
       },
     };
-    return this.authRepository.update(updateOption);
+    const updatedUser = (await this.authRepository.update(updateOption)) as unknown as UserInfoType;
+    /* 
+    레포지토리가 반환하는 타입이 Prisma의 기본 User 타입(프로필 이미지가 없는 상태)으로 추론되는데,
+    실제로는 select 옵션을 통해 profileImage를 포함해서 가져오고 있으므로
+    타입 어설션(as unknown as UserInfoType)을 사용하여 올바른 타입으로 지정합니다.
+    */
+    if (updatedUser.profileImage) {
+      updatedUser.profileImage.url = getS3Url(updatedUser.profileImage.url);
+    }
+    return updatedUser;
   }
 
   async updatePassword(id: number, data: PatchPasswordType, user: User) {

@@ -8,6 +8,7 @@ import type {
 } from '../structs/articleStruct';
 import { ArticleRepository } from '../repository/articleRepository';
 import { HttpError } from '../utils/errors';
+import { getS3Url } from '../utils/s3Handler';
 
 export class ArticleService {
   constructor(private articleRepository: ArticleRepository) {}
@@ -66,13 +67,18 @@ export class ArticleService {
         title: true,
         content: true,
         createdAt: true,
+        articleImages: { select: { url: true } },
         _count: { select: { articleLikes: true } },
       },
     } as const;
 
     const article = await this.articleRepository.findUniqueOrThrow(findUniqueOption);
 
-    return { ...article, isLiked: article._count.articleLikes > 0 };
+    return {
+      ...article,
+      articleImages: article.articleImages.map((img) => getS3Url(img.url)),
+      isLiked: article._count.articleLikes > 0,
+    };
   }
 
   async patchArticle(id: number, body: PatchArticleType, user: User) {

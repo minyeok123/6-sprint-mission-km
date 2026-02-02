@@ -11,6 +11,7 @@ import { NotificationType } from '@prisma/client';
 import { prisma } from '../utils/prismaClient';
 
 import { NotificationService } from './notificationService';
+import { getS3Url } from '../utils/s3Handler';
 
 export class ProductService {
   constructor(
@@ -163,12 +164,17 @@ export class ProductService {
         stock: true,
         productTags: { select: { tag: true } },
         createdAt: true,
+        productImages: { select: { url: true } },
         _count: { select: { productLikes: true } },
       },
     };
     const product = await this.productRepository.findUniqueOrThrow(getProductOptions);
 
-    return { ...product, isLiked: product._count.productLikes > 0 };
+    return {
+      ...product,
+      productImages: product.productImages.map((img) => getS3Url(img.url)),
+      isLiked: product._count.productLikes > 0,
+    };
   }
 
   async deleteProduct(id: number, user: User) {
