@@ -20,20 +20,22 @@ authRouter
   .post('/refresh', tryCatchHandler(AuthController.refreshToken))
   .post('/logout', tryCatchHandler(AuthController.logout));
 
+authRouter.get(
+  '/:userId',
+  authenticate,
+  validate(UserIdParams, 'params'),
+  tryCatchHandler(AuthController.userInfo),
+);
+
+authRouter.patch(
+  '/:userId/update-info',
+  authenticate,
+  validate(UserIdParams, 'params'),
+  validate(PatchUser),
+  tryCatchHandler(AuthController.patchInfo),
+);
+
 authRouter
-  .get(
-    '/:userId',
-    authenticate,
-    validate(UserIdParams, 'params'),
-    tryCatchHandler(AuthController.userInfo),
-  )
-  .patch(
-    '/:userId/update-info',
-    authenticate,
-    validate(UserIdParams, 'params'),
-    validate(PatchUser),
-    tryCatchHandler(AuthController.patchInfo),
-  )
   .patch(
     '/:userId/password',
     authenticate,
