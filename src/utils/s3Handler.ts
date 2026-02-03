@@ -44,7 +44,7 @@ export const getImage = async (key: string) => {
   return s3.send(command);
 };
 
-// S3 URL 생성 헬퍼 (필요하다면)
+// S3 URL 생성 헬퍼
 export const getS3Url = (key: string) => {
   return `https://${AWS_BUKET_NAME}.s3.${AWS_REGION}.amazonaws.com/${key}`;
 };
