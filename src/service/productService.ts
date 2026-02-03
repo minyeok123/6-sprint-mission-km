@@ -119,7 +119,7 @@ export class ProductService {
     }
     const patchedProduct = await this.productRepository.update(productId, {
       ...productData,
-      productTags: tagConnect ? { create: tagConnect } : undefined,
+      productTags: tagConnect ? { deleteMany: {}, create: tagConnect } : undefined,
     });
 
     if (productData.price && productData.price !== findProduct.price) {
