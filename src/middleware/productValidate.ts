@@ -11,7 +11,9 @@ export function productValidate<T, S>(struct: Struct<T, S>) {
       if (body.stock) {
         body.stock = parseInt(body.stock, 10);
       }
-
+      if (body.tag) {
+        body.tag = body.tag;
+      }
       assert(req.body, struct);
       next();
     } catch (e) {

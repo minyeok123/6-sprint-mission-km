@@ -1,9 +1,6 @@
 import 'express-async-errors';
 import express from 'express';
-import { createServer } from 'node:http';
-import { initSocket } from './socket';
 import productRouter from './routers/productRouter';
-import { PORT } from './utils/constants';
 import articleRouter from './routers/articleRouter';
 import commentRouter from './routers/commentRouter';
 import userRouter from './routers/userRouter';
@@ -51,7 +48,4 @@ app.use('/notifications', notificationRouter);
 //전역 에러핸들러
 app.use(errorHandler);
 
-const httpServer = createServer(app);
-initSocket(httpServer);
-
-httpServer.listen(PORT || 3000, () => console.log('server started'));
+export default app

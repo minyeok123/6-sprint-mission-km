@@ -16,5 +16,5 @@ export const ArticleIdParams = s.object({
 });
 export type ArticleIdParamsType = Infer<typeof ArticleIdParams>;
 
-export const GetArticlesQuery = s.intersection([PaginationQuery, SearchQuery, OrderQuery]);
+export const GetArticlesQuery = s.assign(PaginationQuery, s.assign(SearchQuery, OrderQuery));
 export type GetArticlesQueryType = Infer<typeof GetArticlesQuery>;

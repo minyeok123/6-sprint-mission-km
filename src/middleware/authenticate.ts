@@ -8,7 +8,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     if (!accessToken) {
       return res.status(401).send({ message: '유효하지 않은 접근입니다.' });
     }
-    const { userId: userId } = verifyAccessToken(accessToken);
+    const { userId } = verifyAccessToken(accessToken);
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       return res.status(401).send({ message: '아이디 또는 비밀번호가 일치하지 않습니다' });
@@ -16,6 +16,6 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     req.user = user;
     next();
   } catch (e) {
-    return res.status(401).send({ message: '유효하지 않은 접근입니다.' });
+    return res.status(401).send({ message: '유효하지 않은 토큰입니다.' });
   }
 };

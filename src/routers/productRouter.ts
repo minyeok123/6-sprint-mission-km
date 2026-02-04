@@ -33,7 +33,7 @@ productRouter
 //상품 상세 조회 , 상품 업데이트 , 상품 삭제
 productRouter
   .route('/:productId')
-  .get(tryCatchHandler(ProductController.getProductDetail))
+  .get(validate(ProductIdParams, 'params'), tryCatchHandler(ProductController.getProductDetail))
   .patch(
     authenticate,
     productImageUpload.none(),

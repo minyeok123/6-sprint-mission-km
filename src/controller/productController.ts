@@ -8,10 +8,14 @@ import { UserIdParamsType } from '../structs/userStruct';
 import { Request, Response } from 'express';
 import { ProductService } from '../service/productService';
 import { ProductRepository } from '../repository/productRepository';
+import { NotificationService } from '../service/notificationService';
+import { NotificationRepository } from '../repository/notificationRepository';
 import { User } from '@prisma/client';
 import { ValidatedParamsRequest } from '../middleware/validate';
 const productRepository = new ProductRepository();
-const productService = new ProductService(productRepository);
+const notificationRepository = new NotificationRepository();
+const notificationService = new NotificationService(notificationRepository);
+const productService = new ProductService(productRepository, notificationService);
 
 export class ProductController {
   //상품 리스트 조회

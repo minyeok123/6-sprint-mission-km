@@ -2,7 +2,6 @@ import { Server } from 'socket.io';
 import http from 'http';
 import { verifyAccessToken } from './utils/token';
 
-
 let io: Server | null = null;
 
 export const initSocket = (httpServer: http.Server) => {
