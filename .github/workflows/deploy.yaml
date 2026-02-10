@@ -14,7 +14,7 @@ jobs:
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: 22
           script: |
             # 프로젝트 경로로 이동 (서버의 실제 경로로 수정 필요 - 예: /home/ubuntu/project-name)
