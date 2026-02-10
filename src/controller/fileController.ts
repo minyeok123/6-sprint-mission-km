@@ -27,7 +27,21 @@ export class FileController {
       const ext = path.extname(file.originalname);
       const key = `${folder}/${unique}${ext}`;
 
+      // 1. S3 업로드
       await putImage(key, file.buffer, file.mimetype);
+
+      // 2. 개발 환경일 경우 로컬 백업 저장 (uploads 폴더)
+      if (process.env.NODE_ENV === 'development') {
+        const fs = await import('fs/promises'); // 동적 임포트: 프로덕션 환경에서는 fs 모듈을 로드하지 않아 리소스를 절약함
+        const uploadDir = path.join(process.cwd(), 'uploads', folder as string);
+
+        // 폴더가 없으면 생성 (recursive: true -> 중간 폴더도 생성)
+        await fs.mkdir(uploadDir, { recursive: true });
+
+        // 파일 쓰기
+        await fs.writeFile(path.join(uploadDir, `${unique}${ext}`), file.buffer);
+      }
+
       const url = getS3Url(key);
       /* 
       클라이언트에서 업로드된 파일에 접근 해야하기 때문에 Key와 URL 모두 반환
