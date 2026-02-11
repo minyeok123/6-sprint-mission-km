@@ -9,17 +9,30 @@ import {
 } from '../structs/userStruct';
 import bcrypt from 'bcrypt';
 import { generateTokens, verifyRefreshToken } from '../utils/token';
+import { getS3Url } from '../utils/s3Handler';
+
+interface UserInfoType {
+  id: number;
+  name: string;
+  nickname: string;
+  email: string;
+  createdAt: Date;
+  profileImage: {
+    url: string;
+  } | null;
+}
 
 export class AuthService {
   constructor(private authRepository: AuthRepository) {}
 
-  async register(data: CreateUserType, file?: Express.Multer.File) {
-    const { password, receivedEmail, ...userFields } = data;
+  async register(data: CreateUserType) {
+    const { password, receivedEmail, profileImage, ...userFields } = data;
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+
     let image;
-    if (file) {
-      image = { create: { url: `/files/user-profiles/${file.filename}` } };
+    if (profileImage) {
+      image = { create: { url: profileImage } };
     }
     const dataToSave: Prisma.UserCreateArgs = {
       data: {
@@ -40,7 +53,7 @@ export class AuthService {
 
   async login(data: LoginUserType) {
     const { email, password } = data;
-    const user = await this.authRepository.findUnique({ where: { email } });
+    const user = await this.authRepository.findByEmail(email);
     if (!user) {
       throw new HttpError(401, '존재하지 않는 이메일 입니다.');
     }
@@ -59,7 +72,7 @@ export class AuthService {
       throw new HttpError(401, '잘못된 접근입니다.');
     }
     const { userId } = verifyRefreshToken(refreshToken); //클라이언트에서 넘어온 토큰이 우리 서버에서 내려준 토큰과 일치하는지 검증
-    const user = await this.authRepository.findUnique({ where: { id: userId } });
+    const user = await this.authRepository.findUserById(userId);
     if (!user) {
       throw new HttpError(401, '유효하지않은 이메일 입니다.');
     }
@@ -70,27 +83,16 @@ export class AuthService {
 
   async userInfo(id: number, user: User) {
     const userId = id;
-    const getInfoOption = {
-      where: { id: userId },
-      select: {
-        id: true,
-        name: true,
-        nickname: true,
-        email: true,
-        createdAt: true,
-        profileImage: {
-          select: {
-            url: true,
-          },
-        },
-      },
-    };
-    const userInfo = await this.authRepository.findUnique(getInfoOption);
+    const userInfo = await this.authRepository.findUserById(userId);
     if (!userInfo) {
       throw new HttpError(404, '회원 정보를 찾을수 없습니다.');
     }
     if (userInfo.id !== user.id) {
       throw new HttpError(403, '자신의 정보만 조회할 수 있습니다.');
+    }
+
+    if (userInfo.profileImage) {
+      userInfo.profileImage.url = getS3Url(userInfo.profileImage.url);
     }
 
     return userInfo;
@@ -100,27 +102,28 @@ export class AuthService {
     if (id !== user.id) {
       throw new HttpError(403, '정보를 수정할 권한이 없습니다.');
     }
-    const { receivedEmail, ...userFields } = data;
-    const updateOption = {
-      where: { id: id },
-      data: {
-        ...userFields,
-        userPreference: { update: { receivedEmail } },
-      },
-      select: {
-        id: true,
-        name: true,
-        nickname: true,
-        email: true,
-        createdAt: true,
-        profileImage: {
-          select: {
-            url: true,
-          },
+    const { receivedEmail, profileImage, ...userFields } = data;
+
+    let imageUpdate;
+    if (profileImage) {
+      imageUpdate = {
+        upsert: {
+          create: { url: profileImage },
+          update: { url: profileImage },
         },
-      },
-    };
-    return this.authRepository.update(updateOption);
+      };
+    }
+
+    const updatedUser = await this.authRepository.update(id, {
+      ...userFields,
+      userPreference: { update: { receivedEmail } },
+      profileImage: imageUpdate,
+    });
+
+    if (updatedUser.profileImage) {
+      updatedUser.profileImage.url = getS3Url(updatedUser.profileImage.url);
+    }
+    return updatedUser;
   }
 
   async updatePassword(id: number, data: PatchPasswordType, user: User) {
@@ -139,14 +142,7 @@ export class AuthService {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    const updatePasswordOption = {
-      where: { id: userId },
-      data: {
-        password: hashedPassword,
-      },
-    };
-
-    await this.authRepository.update(updatePasswordOption);
+    await this.authRepository.updatePassword(userId, hashedPassword);
   }
 
   async deleteAccount(id: number, user: User) {

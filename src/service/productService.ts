@@ -11,6 +11,7 @@ import { NotificationType } from '@prisma/client';
 import { prisma } from '../utils/prismaClient';
 
 import { NotificationService } from './notificationService';
+import { getS3Url } from '../utils/s3Handler';
 
 export class ProductService {
   constructor(
@@ -49,13 +50,13 @@ export class ProductService {
     return product;
   }
 
-  async createProduct(data: CreateProductType, user: User, files?: Express.Multer.File[]) {
-    const { tag, ...productData } = data;
+  async createProduct(data: CreateProductType, user: User) {
+    const { tag, imageUrls, ...productData } = data;
     let image;
-    if (Array.isArray(files) && files.length > 0) {
+    if (imageUrls && imageUrls.length > 0) {
       image = {
-        create: files.map((file) => ({
-          url: `/files/product-image/${file.filename}`,
+        create: imageUrls.map((url) => ({
+          url,
         })),
       };
     }
@@ -72,35 +73,38 @@ export class ProductService {
     }
 
     const product = await this.productRepository.create({
-      data: {
-        ...productData,
-        productImages: image,
-        productTags: tagConnect ? { create: tagConnect } : undefined,
-        user: { connect: { id: user.id } },
-      },
-      select: {
-        id: true,
-        productName: true,
-        description: true,
-        price: true,
-        stock: true,
-        productTags: { select: { tag: true } },
-        createdAt: true,
-        _count: { select: { productLikes: true } },
-      },
+      ...productData,
+      productImages: image,
+      productTags: tagConnect ? { create: tagConnect } : undefined,
+      user: { connect: { id: user.id } },
     });
-    return product;
+
+    return {
+      ...product,
+      productImages: product.productImages.map((img) => ({
+        id: img.id,
+        url: getS3Url(img.url),
+      })),
+    };
   }
 
   async patchProduct(id: number, data: PatchProductType, user: User) {
     const productId = id;
-    const { tag, ...productData } = data;
+    const { tag, newImages, deleteImageIds, ...productData } = data;
     const findProduct = await this.productRepository.findUniqueOrThrow({
       where: { id: productId },
       select: { userId: true, price: true },
     });
     if (findProduct.userId !== user.id) {
       throw new HttpError(403, '상품을 수정할 권한이 없습니다.');
+    }
+
+    if (deleteImageIds && deleteImageIds.length > 0) {
+      await this.productRepository.deleteImages(deleteImageIds);
+    }
+
+    if (newImages && newImages.length > 0) {
+      await this.productRepository.createImages(newImages.map((url) => ({ productId, url })));
     }
 
     let tagConnect;
@@ -113,22 +117,9 @@ export class ProductService {
         tagConnect = { tag: { connect: { id: newTag.id } } };
       }
     }
-    const patchedProduct = await this.productRepository.update({
-      where: { id: productId },
-      data: {
-        ...productData,
-        productTags: tagConnect ? { create: tagConnect } : undefined,
-      },
-      select: {
-        id: true,
-        productName: true,
-        description: true,
-        price: true,
-        stock: true,
-        productTags: { select: { tag: true } },
-        createdAt: true,
-        _count: { select: { productLikes: true } },
-      },
+    const patchedProduct = await this.productRepository.update(productId, {
+      ...productData,
+      productTags: tagConnect ? { deleteMany: {}, create: tagConnect } : undefined,
     });
 
     if (productData.price && productData.price !== findProduct.price) {
@@ -148,7 +139,13 @@ export class ProductService {
       }
     }
 
-    return patchedProduct;
+    return {
+      ...patchedProduct,
+      productImages: patchedProduct.productImages.map((img) => ({
+        id: img.id,
+        url: getS3Url(img.url),
+      })),
+    };
   }
 
   async getProductDetail(id: number) {
@@ -163,12 +160,17 @@ export class ProductService {
         stock: true,
         productTags: { select: { tag: true } },
         createdAt: true,
+        productImages: { select: { id: true, url: true } },
         _count: { select: { productLikes: true } },
       },
     };
     const product = await this.productRepository.findUniqueOrThrow(getProductOptions);
 
-    return { ...product, isLiked: product._count.productLikes > 0 };
+    return {
+      ...product,
+      productImages: product.productImages.map((img) => ({ id: img.id, url: getS3Url(img.url) })),
+      isLiked: product._count.productLikes > 0,
+    };
   }
 
   async deleteProduct(id: number, user: User) {

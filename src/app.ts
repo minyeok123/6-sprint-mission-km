@@ -11,6 +11,8 @@ import cookieParser from 'cookie-parser';
 import authRouter from './routers/authRouter';
 import likeRouter from './routers/likeRouter';
 import notificationRouter from './routers/notificationRouter';
+import fileRouter from './routers/fileRouter';
+
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
@@ -18,8 +20,10 @@ app.use(cookieParser());
 app.use('/files', express.static('uploads'));
 app.use(express.static('public'));
 
-
 app.use(cors());
+
+// 파일 업로드 라우터
+app.use('/files', fileRouter);
 
 //중고마켓 라우트 핸들러
 app.use('/products', productRouter);
@@ -48,4 +52,4 @@ app.use('/notifications', notificationRouter);
 //전역 에러핸들러
 app.use(errorHandler);
 
-export default app
+export default app;

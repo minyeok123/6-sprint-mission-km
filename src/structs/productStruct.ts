@@ -9,10 +9,17 @@ export const CreateProduct = s.object({
   price: s.min(s.integer(), 0),
   tag: s.size(s.string(), 1, 10),
   stock: s.min(s.integer(), 1),
+  imageUrls: s.optional(s.array(s.string())),
 });
 export type CreateProductType = Infer<typeof CreateProduct>;
 
-export const PatchProduct = s.partial(CreateProduct);
+export const PatchProduct = s.assign(
+  s.partial(CreateProduct),
+  s.object({
+    newImages: s.optional(s.array(s.string())),
+    deleteImageIds: s.optional(s.array(s.number())),
+  }),
+);
 export type PatchProductType = Infer<typeof PatchProduct>;
 
 export const ProductIdParams = s.object({

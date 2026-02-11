@@ -5,10 +5,17 @@ import { NumberFromString } from './commonStruct';
 export const CreateArticle = s.object({
   title: s.size(s.string(), 1, 30),
   content: s.size(s.string(), 1, 100),
+  imageUrls: s.optional(s.array(s.string())),
 });
 export type CreateArticleType = Infer<typeof CreateArticle>;
 
-export const PatchArticle = s.partial(CreateArticle);
+export const PatchArticle = s.assign(
+  s.partial(CreateArticle),
+  s.object({
+    newImages: s.optional(s.array(s.string())),
+    deleteImageIds: s.optional(s.array(s.number())),
+  }),
+);
 export type PatchArticleType = Infer<typeof PatchArticle>;
 
 export const ArticleIdParams = s.object({

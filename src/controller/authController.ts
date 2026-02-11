@@ -20,8 +20,7 @@ export class AuthController {
   //회원가입
   static register = async (req: Request, res: Response) => {
     const data = req.body as CreateUserType;
-    const profileImage = req.file as Express.Multer.File;
-    const userWithoutPassword = await authService.register(data, profileImage);
+    const userWithoutPassword = await authService.register(data);
 
     res.status(201).send(userWithoutPassword);
   };

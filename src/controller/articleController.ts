@@ -25,9 +25,8 @@ export class ArticleController {
   //게시글 생성
   static createArticle = async (req: Request, res: Response) => {
     const articleData = req.body as CreateArticleType;
-    const articleImage = req.files as Express.Multer.File[];
     const user = req.user as User;
-    const article = await articleService.createArticle(articleData, user, articleImage);
+    const article = await articleService.createArticle(articleData, user);
     res.status(201).send(article);
   };
 
