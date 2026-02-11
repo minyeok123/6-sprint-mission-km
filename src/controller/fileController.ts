@@ -31,7 +31,8 @@ export class FileController {
       await putImage(key, file.buffer, file.mimetype);
 
       // 2. 개발 환경일 경우 로컬 백업 저장 (uploads 폴더)
-      if (process.env.NODE_ENV === 'development') {
+      //    로컬 환경일 때만 파일 시스템에 저장 (EC2 등에서는 저장 안 함)
+      if (process.env.IS_LOCAL === 'true') {
         const fs = await import('fs/promises'); // 동적 임포트: 프로덕션 환경에서는 fs 모듈을 로드하지 않아 리소스를 절약함
         const uploadDir = path.join(process.cwd(), 'uploads', folder as string);
 

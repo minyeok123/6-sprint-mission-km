@@ -11,6 +11,8 @@ services:
       context: .
     container_name: panda-market
     env_file: .env # .env 파일의 변수들을 사용
+    environment:
+      - IS_LOCAL=true # 로컬에서만 파일 시스템 저장을 활성화
     ports:
       - '3000:3000' # 호스트:컨테이너 포트 연결
     depends_on:
